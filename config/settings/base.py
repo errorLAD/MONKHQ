@@ -10,7 +10,7 @@ default_db_url = 'sqlite:////tmp/db.sqlite3' if is_vercel else f'sqlite:///{BASE
 
 env = environ.Env(
     DEBUG=(bool, True),
-    SECRET_KEY=(str, 'django-insecure-monkhq-production-super-secret-key-2026!'),
+    SECRET_KEY=(str, 'monkhq_prod_sec_994a8f3b21c40e1e87d9a102bc4501a3498dfe82194bb610ea98c39240ab12f6'),
     ALLOWED_HOSTS=(list, ['*', '.vercel.app', 'localhost', '127.0.0.1']),
     DATABASE_URL=(str, default_db_url),
     REDIS_URL=(str, 'redis://localhost:6379/0'),
@@ -18,7 +18,7 @@ env = environ.Env(
 
 environ.Env.read_env(BASE_DIR / '.env')
 
-SECRET_KEY = env('SECRET_KEY', default='django-insecure-monkhq-production-super-secret-key-2026!')
+SECRET_KEY = env('SECRET_KEY', default='monkhq_prod_sec_994a8f3b21c40e1e87d9a102bc4501a3498dfe82194bb610ea98c39240ab12f6')
 DEBUG = env('DEBUG', default=True)
 ALLOWED_HOSTS = env('ALLOWED_HOSTS', default=['*', '.vercel.app', 'localhost', '127.0.0.1'])
 
@@ -165,9 +165,9 @@ REST_FRAMEWORK = {
 # Meta / Instagram API (Instagram Login for Tech Providers)
 META_APP_ID = env('META_APP_ID', default='')
 META_APP_SECRET = env('META_APP_SECRET', default='')
-INSTAGRAM_REDIRECT_URI = env('INSTAGRAM_REDIRECT_URI', default='http://localhost:8000/social/callback/')
+INSTAGRAM_REDIRECT_URI = env('INSTAGRAM_REDIRECT_URI', default='https://monkhq.in/social/callback/' if is_vercel else 'http://localhost:8000/social/callback/')
 META_WEBHOOK_VERIFY_TOKEN = env('META_WEBHOOK_VERIFY_TOKEN', default='')
-INSTAGRAM_SCOPES = env('INSTAGRAM_SCOPES', default='instagram_business_basic,instagram_business_manage_comments')
+INSTAGRAM_SCOPES = env('INSTAGRAM_SCOPES', default='instagram_business_basic,instagram_business_manage_comments,instagram_business_manage_messages,instagram_content_publish')
 
 # Google Gemini AI Integration (MonkHQ AI Engine)
 GEMINI_API_KEY = env('GEMINI_API_KEY', default=env('GOOGLE_API_KEY', default=''))

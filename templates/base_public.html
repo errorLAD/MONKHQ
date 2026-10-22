@@ -74,6 +74,20 @@
     {% block content %}{% endblock %}
     {% block auth_content %}{% endblock %}
 
+    <!-- Minimal Public Legal Footer -->
+    <footer class="py-8 px-4 text-center text-xs text-slate-400 space-y-2 border-t border-slate-200/60 mt-12 bg-white/50 backdrop-blur-xs">
+        <p>&copy; 2026 MonkHQ Platform &bull; All rights reserved.</p>
+        <div class="flex items-center justify-center gap-4 text-slate-500 font-medium">
+            <a href="{% url 'privacy_policy' %}" class="hover:text-purple-600 transition">Privacy Policy</a>
+            <span>&bull;</span>
+            <a href="{% url 'terms_of_service' %}" class="hover:text-purple-600 transition">Terms of Service</a>
+            <span>&bull;</span>
+            <a href="{% url 'meta_data_deletion' %}" class="hover:text-purple-600 transition">Data Deletion</a>
+            <span>&bull;</span>
+            <a href="{% url 'meta_deauthorize' %}" class="hover:text-purple-600 transition">Deauthorization</a>
+        </div>
+    </footer>
+
     <script>
         lucide.createIcons();
     </script>

@@ -8,4 +8,6 @@ urlpatterns = [
     path('deauthorize/', views.meta_deauthorize_view, name='meta_deauthorize'),
     path('data-deletion/', views.meta_data_deletion_view, name='meta_data_deletion'),
     path('deletion-status/', views.meta_deletion_status_view, name='meta_deletion_status'),
+    path('publish/', views.instagram_publish_view, name='instagram_publish'),
+    path('posts/', views.instagram_posts_list_view, name='instagram_posts_list'),
 ]

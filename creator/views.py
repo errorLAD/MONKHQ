@@ -45,6 +45,14 @@ def landing_view(request):
             return redirect('admin_platform_dashboard')
     return render(request, 'landing.html')
 
+def privacy_policy_view(request):
+    """Serve official Privacy Policy page required for Meta App Review & GDPR."""
+    return render(request, 'legal/privacy_policy.html')
+
+def terms_of_service_view(request):
+    """Serve official Terms of Service page required for Meta App Review."""
+    return render(request, 'legal/terms_of_service.html')
+
 def robots_txt_view(request):
     """Serve production-grade robots.txt for search engine crawlers."""
     host = f"{request.scheme}://{request.get_host()}"
@@ -67,6 +75,10 @@ def sitemap_xml_view(request):
     host = f"{request.scheme}://{request.get_host()}"
     urls = [
         {"loc": f"{host}/", "changefreq": "daily", "priority": "1.0"},
+        {"loc": f"{host}/privacy-policy/", "changefreq": "monthly", "priority": "0.7"},
+        {"loc": f"{host}/terms/", "changefreq": "monthly", "priority": "0.7"},
+        {"loc": f"{host}/social/data-deletion/", "changefreq": "monthly", "priority": "0.6"},
+        {"loc": f"{host}/social/deauthorize/", "changefreq": "monthly", "priority": "0.6"},
         {"loc": f"{host}/accounts/login-hub/", "changefreq": "weekly", "priority": "0.8"},
         {"loc": f"{host}/accounts/creator/signup/", "changefreq": "weekly", "priority": "0.9"},
         {"loc": f"{host}/accounts/creator/login/", "changefreq": "monthly", "priority": "0.7"},

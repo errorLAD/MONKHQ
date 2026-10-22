@@ -654,3 +654,147 @@ class MetaDeauthorizeAndDataDeletionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "del_123")
 
+
+class InstagramContentPublishingTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username="publisher_creator",
+            email="publisher@monkhq.in",
+            password="SecurePassword123!",
+            role="CREATOR"
+        )
+        self.workspace = Workspace.objects.create(
+            name="Publisher Workspace",
+            slug="publisher-workspace",
+            owner=self.user,
+            workspace_type="CREATOR"
+        )
+        self.account = SocialAccount.objects.create(
+            workspace=self.workspace,
+            platform='INSTAGRAM',
+            account_id='17841400112233',
+            account_name='Publisher IG Test',
+            username='publisher_ig',
+            is_connected=True
+        )
+        from social.services import encrypt_token
+        self.token = MetaToken.objects.create(
+            social_account=self.account,
+            access_token_encrypted=encrypt_token('EAABtest_valid_meta_token_12345'),
+            token_type='Bearer'
+        )
+
+    def test_publish_unauthenticated_redirects(self):
+        """Unauthenticated requests to publish page redirect to login."""
+        resp = self.client.get(reverse('instagram_publish'))
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn('/accounts/login/', resp.url)
+
+    def test_publish_get_renders_composer(self):
+        """Authenticated user sees Instagram publisher composer with connected account."""
+        self.client.force_login(self.user)
+        resp = self.client.get(reverse('instagram_publish'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Instagram Post Publisher")
+        self.assertContains(resp, "@publisher_ig")
+        self.assertContains(resp, "instagram_content_publish")
+
+    def test_publish_post_rejects_non_https_media(self):
+        """Publishing must reject non-HTTPS URLs as required by Meta."""
+        self.client.force_login(self.user)
+        resp = self.client.post(
+            reverse('instagram_publish'),
+            data={
+                'account_id': '17841400112233',
+                'media_url': 'http://insecure.example.com/photo.jpg',
+                'caption': 'Testing insecure link',
+                'media_type': 'IMAGE'
+            },
+            follow=True
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Meta requires the media URL to use a secure HTTPS protocol.")
+        from social.models import InstagramPost
+        self.assertEqual(InstagramPost.objects.count(), 0)
+
+    @patch('social.services.requests.post')
+    @patch('social.services.requests.get')
+    def test_publish_post_success_flow(self, mock_get, mock_post):
+        """Full publishing flow calls Meta container + publish endpoints and stores record."""
+        # Mock container creation (Step 1)
+        mock_container_resp = MagicMock()
+        mock_container_resp.status_code = 200
+        mock_container_resp.json.return_value = {'id': '179998887770001'}
+
+        # Mock media publish (Step 2)
+        mock_publish_resp = MagicMock()
+        mock_publish_resp.status_code = 200
+        mock_publish_resp.json.return_value = {'id': '180009998881112'}
+
+        mock_post.side_effect = [mock_container_resp, mock_publish_resp]
+
+        # Mock permalink lookup
+        mock_permalink_resp = MagicMock()
+        mock_permalink_resp.status_code = 200
+        mock_permalink_resp.json.return_value = {'permalink': 'https://www.instagram.com/p/TESTPOST123/'}
+        mock_get.return_value = mock_permalink_resp
+
+        self.client.force_login(self.user)
+        resp = self.client.post(
+            reverse('instagram_publish'),
+            data={
+                'account_id': '17841400112233',
+                'media_url': 'https://images.unsplash.com/photo-1618005182384.jpg',
+                'caption': 'Check out our new launch! Comment LINK for 20% off. #MonkHQ',
+                'media_type': 'IMAGE'
+            },
+            follow=True
+        )
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Successfully published post to @publisher_ig")
+
+        from social.models import InstagramPost
+        post = InstagramPost.objects.first()
+        self.assertIsNotNone(post)
+        self.assertEqual(post.status, 'PUBLISHED')
+        self.assertEqual(post.instagram_media_id, '180009998881112')
+        self.assertEqual(post.container_id, '179998887770001')
+        self.assertEqual(post.permalink, 'https://www.instagram.com/p/TESTPOST123/')
+        self.assertIsNotNone(post.published_at)
+
+    def test_posts_list_view_returns_json(self):
+        """GET /social/posts/ returns JSON list of published posts for workspace."""
+        from social.models import InstagramPost
+        InstagramPost.objects.create(
+            workspace=self.workspace,
+            social_account=self.account,
+            media_type='IMAGE',
+            caption='API post test',
+            media_url='https://example.com/test.jpg',
+            status='PUBLISHED',
+            instagram_media_id='ig_999999'
+        )
+        self.client.force_login(self.user)
+        resp = self.client.get(reverse('instagram_posts_list'))
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertIn('posts', data)
+        self.assertEqual(len(data['posts']), 1)
+        self.assertEqual(data['posts'][0]['instagram_media_id'], 'ig_999999')
+
+    def test_privacy_policy_accessible_200_ok(self):
+        """Privacy Policy must return 200 OK with compliance terms."""
+        resp = self.client.get(reverse('privacy_policy'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Privacy Policy")
+        self.assertContains(resp, "instagram_content_publish")
+
+    def test_terms_of_service_accessible_200_ok(self):
+        """Terms of Service must return 200 OK."""
+        resp = self.client.get(reverse('terms_of_service'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Terms of Service")
+
+

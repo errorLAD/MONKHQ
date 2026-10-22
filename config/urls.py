@@ -9,6 +9,10 @@ from linkhub import views as linkhub_views
 urlpatterns = [
     path('', creator_views.landing_view, name='home'),
     path('landing/', creator_views.landing_view, name='landing'),
+    path('privacy-policy/', creator_views.privacy_policy_view, name='privacy_policy'),
+    path('privacy/', creator_views.privacy_policy_view, name='privacy_policy_alias'),
+    path('terms/', creator_views.terms_of_service_view, name='terms_of_service'),
+    path('terms-of-service/', creator_views.terms_of_service_view, name='terms_of_service_alias'),
     path('robots.txt', creator_views.robots_txt_view, name='robots_txt'),
     path('sitemap.xml', creator_views.sitemap_xml_view, name='sitemap_xml'),
     path('django-admin/', admin.site.urls),

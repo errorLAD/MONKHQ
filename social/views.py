@@ -15,13 +15,14 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from automations.models import Automation, AutomationExecution, AutomationLog
-from social.models import AccountHealth, MetaToken, SocialAccount
+from social.models import AccountHealth, MetaToken, SocialAccount, InstagramPost
 from social.services import (
     build_instagram_authorization_url,
     encrypt_token,
     exchange_code_for_token,
     exchange_for_long_lived_token,
     fetch_instagram_profile,
+    publish_to_instagram,
 )
 from workspaces.models import Workspace
 
@@ -507,3 +508,96 @@ def meta_deletion_status_view(request):
         'confirmation_code': code,
         'timestamp': timezone.now(),
     })
+
+
+@login_required(login_url='login_hub')
+def instagram_publish_view(request):
+    """
+    Official Meta Instagram Content Publishing View:
+    Allows authenticated creators to compose and publish photos or reels
+    directly to their connected Instagram Business/Creator feed.
+    """
+    workspace = getattr(request, 'workspace', None)
+    if not workspace:
+        workspace = Workspace.objects.filter(owner=request.user, is_active=True).first()
+
+    connected_accounts = SocialAccount.objects.filter(
+        workspace=workspace,
+        platform='INSTAGRAM',
+        is_connected=True
+    )
+
+    if request.method == 'POST':
+        account_id = request.POST.get('account_id')
+        media_url = request.POST.get('media_url', '').strip()
+        caption = request.POST.get('caption', '').strip()
+        media_type = request.POST.get('media_type', 'IMAGE').upper()
+
+        if not account_id:
+            messages.error(request, "Please select an Instagram account to publish to.")
+            return redirect('instagram_publish')
+
+        social_account = connected_accounts.filter(account_id=account_id).first()
+        if not social_account:
+            messages.error(request, "Selected Instagram account is not connected or unauthorized.")
+            return redirect('instagram_publish')
+
+        if not media_url:
+            messages.error(request, "A media URL (HTTPS) is required to publish to Instagram.")
+            return redirect('instagram_publish')
+
+        if not media_url.startswith('https://'):
+            messages.error(request, "Meta requires the media URL to use a secure HTTPS protocol.")
+            return redirect('instagram_publish')
+
+        # Execute publishing via Meta Graph API
+        result = publish_to_instagram(
+            social_account=social_account,
+            media_url=media_url,
+            caption=caption,
+            media_type=media_type,
+            workspace=workspace
+        )
+
+        if result.get('success'):
+            messages.success(request, f"Successfully published post to @{social_account.username} on Instagram! (Media ID: {result.get('media_id')})")
+        else:
+            messages.error(request, f"Meta publishing error: {result.get('error')}")
+
+        return redirect('instagram_publish')
+
+    recent_posts = InstagramPost.objects.filter(workspace=workspace).select_related('social_account')[:20]
+
+    return render(request, 'social/publish.html', {
+        'workspace': workspace,
+        'accounts': connected_accounts,
+        'recent_posts': recent_posts,
+    })
+
+
+@login_required(login_url='login_hub')
+def instagram_posts_list_view(request):
+    """
+    API view returning JSON list of published posts for this workspace.
+    """
+    workspace = getattr(request, 'workspace', None)
+    if not workspace:
+        workspace = Workspace.objects.filter(owner=request.user, is_active=True).first()
+
+    posts = InstagramPost.objects.filter(workspace=workspace).select_related('social_account')[:50]
+    data = [
+        {
+            'id': str(p.id),
+            'account': p.social_account.username,
+            'media_type': p.media_type,
+            'caption': p.caption,
+            'media_url': p.media_url,
+            'status': p.status,
+            'instagram_media_id': p.instagram_media_id,
+            'permalink': p.permalink,
+            'published_at': p.published_at.isoformat() if p.published_at else None,
+            'error_message': p.error_message,
+        }
+        for p in posts
+    ]
+    return JsonResponse({'posts': data}, status=200)

@@ -5,6 +5,7 @@ import requests
 from urllib.parse import urlencode
 from cryptography.fernet import Fernet
 from django.conf import settings
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -162,3 +163,179 @@ def fetch_instagram_profile(access_token: str) -> dict:
     except requests.RequestException as e:
         logger.error(f"Network error fetching Instagram profile: {e}")
         return {'success': False, 'error': 'Network error connecting to Instagram Graph API.'}
+
+
+def create_instagram_media_container(social_account, media_url: str, caption: str = "", media_type: str = "IMAGE") -> dict:
+    """
+    Step 1 of Instagram Content Publishing API: Create an item container.
+    Endpoint: POST https://graph.instagram.com/v21.0/{ig-user-id}/media
+    """
+    if not hasattr(social_account, 'meta_token') or not social_account.meta_token:
+        return {'success': False, 'error': 'No Meta access token associated with this Instagram account.'}
+
+    access_token = decrypt_token(social_account.meta_token.access_token_encrypted)
+    if not access_token:
+        return {'success': False, 'error': 'Failed to decrypt access token for Instagram account.'}
+
+    account_id = str(social_account.account_id)
+    url = f"https://graph.instagram.com/v21.0/{account_id}/media"
+
+    payload = {
+        'access_token': access_token,
+        'caption': caption,
+    }
+
+    if media_type.upper() == 'REEL':
+        payload['media_type'] = 'REELS'
+        payload['video_url'] = media_url
+    else:
+        payload['image_url'] = media_url
+
+    try:
+        response = requests.post(url, data=payload, timeout=20)
+        data = response.json()
+        if response.status_code == 200 and 'id' in data:
+            return {
+                'success': True,
+                'container_id': str(data['id']),
+            }
+        else:
+            err = data.get('error', {}).get('message') or f"HTTP {response.status_code} creating media container."
+            logger.warning(f"Instagram media container creation failed: {err}")
+            return {'success': False, 'error': err}
+    except requests.RequestException as e:
+        logger.error(f"Network error creating Instagram media container: {e}")
+        return {'success': False, 'error': f"Network error during media container creation: {e}"}
+
+
+def publish_instagram_media_container(social_account, container_id: str) -> dict:
+    """
+    Step 2 of Instagram Content Publishing API: Publish the created container.
+    Endpoint: POST https://graph.instagram.com/v21.0/{ig-user-id}/media_publish
+    """
+    if not hasattr(social_account, 'meta_token') or not social_account.meta_token:
+        return {'success': False, 'error': 'No Meta access token associated with this Instagram account.'}
+
+    access_token = decrypt_token(social_account.meta_token.access_token_encrypted)
+    account_id = str(social_account.account_id)
+    url = f"https://graph.instagram.com/v21.0/{account_id}/media_publish"
+
+    payload = {
+        'creation_id': container_id,
+        'access_token': access_token,
+    }
+
+    try:
+        response = requests.post(url, data=payload, timeout=25)
+        data = response.json()
+        if response.status_code == 200 and 'id' in data:
+            return {
+                'success': True,
+                'media_id': str(data['id']),
+            }
+        else:
+            err = data.get('error', {}).get('message') or f"HTTP {response.status_code} publishing media container."
+            logger.warning(f"Instagram media publish failed: {err}")
+            return {'success': False, 'error': err}
+    except requests.RequestException as e:
+        logger.error(f"Network error publishing Instagram media: {e}")
+        return {'success': False, 'error': f"Network error during media publishing: {e}"}
+
+
+def fetch_instagram_media_permalink(social_account, media_id: str) -> str:
+    """
+    Fetches the live public permalink for a published Instagram media item.
+    """
+    if not hasattr(social_account, 'meta_token') or not social_account.meta_token:
+        return ""
+
+    access_token = decrypt_token(social_account.meta_token.access_token_encrypted)
+    url = f"https://graph.instagram.com/v21.0/{media_id}"
+    params = {
+        'fields': 'permalink',
+        'access_token': access_token,
+    }
+    try:
+        resp = requests.get(url, params=params, timeout=10)
+        if resp.status_code == 200:
+            return resp.json().get('permalink', '')
+    except Exception as e:
+        logger.warning(f"Failed to fetch permalink for media {media_id}: {e}")
+    return ""
+
+
+def publish_to_instagram(social_account, media_url: str, caption: str = "", media_type: str = "IMAGE", workspace=None):
+    """
+    Complete flow to publish media to Instagram:
+    1. Validates account connection and tokens.
+    2. Records post in database.
+    3. Creates Instagram Media Container.
+    4. Publishes Media Container to Instagram feed.
+    5. Updates post with live Instagram Media ID and permalink.
+    """
+    from social.models import InstagramPost
+
+    target_workspace = workspace or social_account.workspace
+
+    post_record = InstagramPost.objects.create(
+        workspace=target_workspace,
+        social_account=social_account,
+        media_type=media_type.upper(),
+        caption=caption,
+        media_url=media_url,
+        status='PUBLISHING'
+    )
+
+    if not social_account.is_connected:
+        post_record.status = 'FAILED'
+        post_record.error_message = "Instagram account is disconnected. Please reconnect your account."
+        post_record.save(update_fields=['status', 'error_message'])
+        return {'success': False, 'post': post_record, 'error': post_record.error_message}
+
+    # Step 1: Create Container
+    container_res = create_instagram_media_container(
+        social_account=social_account,
+        media_url=media_url,
+        caption=caption,
+        media_type=media_type
+    )
+
+    if not container_res.get('success'):
+        post_record.status = 'FAILED'
+        post_record.error_message = container_res.get('error', 'Failed to create Instagram container.')
+        post_record.save(update_fields=['status', 'error_message'])
+        return {'success': False, 'post': post_record, 'error': post_record.error_message}
+
+    container_id = container_res['container_id']
+    post_record.container_id = container_id
+    post_record.status = 'CONTAINER_CREATED'
+    post_record.save(update_fields=['container_id', 'status'])
+
+    # Step 2: Publish Container
+    publish_res = publish_instagram_media_container(
+        social_account=social_account,
+        container_id=container_id
+    )
+
+    if not publish_res.get('success'):
+        post_record.status = 'FAILED'
+        post_record.error_message = publish_res.get('error', 'Failed to publish Instagram media container.')
+        post_record.save(update_fields=['status', 'error_message'])
+        return {'success': False, 'post': post_record, 'error': post_record.error_message}
+
+    media_id = publish_res['media_id']
+    permalink = fetch_instagram_media_permalink(social_account, media_id)
+
+    post_record.status = 'PUBLISHED'
+    post_record.instagram_media_id = media_id
+    post_record.permalink = permalink or f"https://www.instagram.com/p/{media_id}/"
+    post_record.published_at = timezone.now()
+    post_record.error_message = ""
+    post_record.save(update_fields=['status', 'instagram_media_id', 'permalink', 'published_at', 'error_message'])
+
+    return {
+        'success': True,
+        'post': post_record,
+        'media_id': media_id,
+        'permalink': post_record.permalink,
+    }

@@ -1,0 +1,146 @@
+{% extends "base_public.html" %}
+
+{% block title %}Privacy Policy — MonkHQ{% endblock %}
+{% block meta_description %}MonkHQ Privacy Policy explaining how we protect your information, Meta/Instagram data usage, and compliance with GDPR and Meta Platform Terms.{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 sm:p-12 space-y-8">
+        
+        <!-- Header -->
+        <div class="border-b border-slate-100 pb-6">
+            <div class="flex items-center space-x-2 text-xs font-extrabold uppercase tracking-wider text-purple-600 mb-2">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                <span>Legal & Compliance</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">Privacy Policy</h1>
+            <p class="text-xs text-slate-500 mt-2 font-mono">Last updated: October 22, 2026 &bull; Effective Immediately</p>
+        </div>
+
+        <!-- Content Sections -->
+        <div class="prose prose-slate max-w-none space-y-6 text-sm text-slate-700 leading-relaxed">
+            
+            <section class="space-y-2">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 text-xs flex items-center justify-center font-bold">1</span>
+                    Introduction
+                </h2>
+                <p>
+                    Welcome to <strong>MonkHQ</strong> ("we," "our," or "us"). We provide a social commerce and automation platform designed to help content creators and brands turn public social interactions into private sales conversations, automate comment replies, deliver digital products, and manage influencer marketing campaigns.
+                </p>
+                <p>
+                    We respect your privacy and are committed to protecting personal data. This Privacy Policy outlines how MonkHQ collects, uses, encrypts, and retains your data, particularly in connection with the <strong>Meta Platform (Instagram Graph API and Facebook Login)</strong>, in compliance with GDPR, CCPA, and Meta Platform Terms.
+                </p>
+            </section>
+
+            <section class="space-y-2">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 text-xs flex items-center justify-center font-bold">2</span>
+                    Information We Collect
+                </h2>
+                <p>When you create an account or link your Instagram account with MonkHQ, we collect:</p>
+                <ul class="list-disc list-inside space-y-1.5 pl-2 text-slate-600 text-xs">
+                    <li><strong>Account Information:</strong> Name, email address, password hash, and workspace role (Creator, Brand, or Platform Admin).</li>
+                    <li><strong>Meta & Instagram Data:</strong> Instagram account ID, username, profile picture URL, public post comments, media IDs, and OAuth tokens.</li>
+                    <li><strong>Automation Configuration:</strong> Trigger keywords, automated reply copy, sales funnels, and dispatch metrics.</li>
+                    <li><strong>Billing Details:</strong> Subscription tier, tax jurisdiction, and billing status (all credit card details are handled via PCI-DSS compliant processors).</li>
+                </ul>
+            </section>
+
+            <section class="space-y-2">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 text-xs flex items-center justify-center font-bold">3</span>
+                    Meta API Scopes & Data Usage
+                </h2>
+                <p>
+                    MonkHQ requests only the minimum permissions necessary to deliver our automation services. Specifically:
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <strong class="text-slate-900 block font-mono">instagram_business_basic</strong>
+                        <p class="text-slate-500 mt-1">Identifies connected Instagram business/creator accounts and displays account identity in your creator workspace.</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <strong class="text-slate-900 block font-mono">instagram_business_manage_comments</strong>
+                        <p class="text-slate-500 mt-1">Receives real-time webhook events when followers leave comments on your posts or reels to trigger keyword automations.</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <strong class="text-slate-900 block font-mono">instagram_business_manage_messages</strong>
+                        <p class="text-slate-500 mt-1">Allows the creator's authorized bot to send automated DM responses, coupon codes, and link cards requested by commenters.</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <strong class="text-slate-900 block font-mono">instagram_content_publish</strong>
+                        <p class="text-slate-500 mt-1">Allows creators to publish scheduled posts, photos, and reels directly to their verified Instagram feed from MonkHQ.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-2">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 text-xs flex items-center justify-center font-bold">4</span>
+                    Security & Token Encryption
+                </h2>
+                <p>
+                    We treat Meta API access tokens with bank-grade security. All tokens (short-lived and 60-day long-lived tokens) are <strong>symmetrically encrypted at rest using AES-128/Fernet cryptographic keys</strong> derived from private server secrets. Tokens are never exposed in client-side code, logs, or public API endpoints.
+                </p>
+            </section>
+
+            <section class="space-y-2">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 text-xs flex items-center justify-center font-bold">5</span>
+                    No Sale or Transfer of Personal Data
+                </h2>
+                <p>
+                    <strong>MonkHQ does NOT sell, rent, monetize, or transfer your personal data, follower data, or Meta API content to any third parties, brokers, or advertising networks.</strong> Your data is used exclusively to operate your workspace automations.
+                </p>
+            </section>
+
+            <section class="space-y-2">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 text-xs flex items-center justify-center font-bold">6</span>
+                    Data Deletion & Deauthorization Rights
+                </h2>
+                <p>
+                    You maintain complete sovereignty over your data at all times:
+                </p>
+                <ul class="list-disc list-inside space-y-1.5 pl-2 text-slate-600 text-xs">
+                    <li>
+                        <strong>App Deauthorization:</strong> You can disconnect MonkHQ at any time from your Instagram / Facebook Settings > Apps and Websites. Our server instantly processes deauthorization via our verified <a href="/social/deauthorize/" class="text-purple-600 underline font-semibold">Deauthorization Callback</a>.
+                    </li>
+                    <li>
+                        <strong>Data Deletion Requests:</strong> You can request immediate erasure of all your data via our <a href="/social/data-deletion/" class="text-purple-600 underline font-semibold">Data Deletion Callback</a> or by emailing our privacy team.
+                    </li>
+                </ul>
+            </section>
+
+            <section class="space-y-2">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 text-xs flex items-center justify-center font-bold">7</span>
+                    Contact Information
+                </h2>
+                <p>
+                    If you have questions or concerns regarding our privacy practices or data handling, please contact:
+                </p>
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1 font-mono text-slate-700">
+                    <p><strong>MonkHQ Data Protection & Privacy Office</strong></p>
+                    <p>Email: <a href="mailto:privacy@monkhq.in" class="text-purple-600 underline">privacy@monkhq.in</a> &bull; <a href="mailto:support@monkhq.in" class="text-purple-600 underline">support@monkhq.in</a></p>
+                    <p>Website: <a href="https://monkhq.in" class="text-purple-600 underline">https://monkhq.in</a></p>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Footer / Return -->
+        <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+            <a href="/" class="inline-flex items-center text-xs font-bold text-slate-600 hover:text-purple-600 transition">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-1.5"></i> Back to Homepage
+            </a>
+            <div class="flex items-center space-x-4 text-xs font-semibold text-slate-400">
+                <a href="/terms/" class="hover:text-purple-600 transition">Terms of Service</a>
+                <a href="/social/data-deletion/" class="hover:text-purple-600 transition">Data Deletion</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

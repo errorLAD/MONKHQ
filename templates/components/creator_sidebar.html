@@ -270,6 +270,13 @@
                 <a href="{% url 'creator_social_accounts' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_social_accounts' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
                     <i data-lucide="instagram" class="w-3.5 h-3.5 text-[#B42318]"></i> <span>SOCIAL ACCOUNTS</span>
                 </a>
+                <a href="{% url 'instagram_publish' %}" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg {% if curr == 'instagram_publish' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="send" class="w-3.5 h-3.5 text-purple-600"></i>
+                        <span>IG PUBLISHER</span>
+                    </div>
+                    <span class="px-1.5 py-0.5 text-[8px] font-extrabold rounded-full bg-purple-50 text-purple-700">API</span>
+                </a>
                 <a href="{% url 'creator_account_health' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_account_health' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
                     <i data-lucide="activity" class="w-3.5 h-3.5 text-[#067647]"></i> <span>ACCOUNT HEALTH</span>
                 </a>

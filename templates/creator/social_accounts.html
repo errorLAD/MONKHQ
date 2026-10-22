@@ -10,10 +10,16 @@
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">Connected Social Accounts</h1>
             <p class="text-xs text-slate-500 mt-1">Official Meta Instagram API integrations for comment automation and analytics.</p>
         </div>
-        <a href="{% url 'connect_instagram' %}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md transition">
-            <i data-lucide="instagram" class="w-4 h-4"></i>
-            + Connect Instagram Account
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="{% url 'instagram_publish' %}" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md transition">
+                <i data-lucide="send" class="w-4 h-4 text-purple-400"></i>
+                Publish to Instagram
+            </a>
+            <a href="{% url 'connect_instagram' %}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md transition">
+                <i data-lucide="instagram" class="w-4 h-4"></i>
+                + Connect Instagram Account
+            </a>
+        </div>
     </div>
 
     <!-- Status Overview & Accounts List -->
@@ -112,6 +118,16 @@
                 <span class="font-bold text-slate-800 block mb-0.5">Comment Management</span>
                 <span class="text-slate-500 text-[11px] font-mono">instagram_business_manage_comments</span>
                 <p class="text-slate-500 text-[11px] mt-1">Detects incoming comments to trigger automated product links and sales flows.</p>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs">
+                <span class="font-bold text-slate-800 block mb-0.5">Direct Messaging</span>
+                <span class="text-slate-500 text-[11px] font-mono">instagram_business_manage_messages</span>
+                <p class="text-slate-500 text-[11px] mt-1">Dispatches requested links, coupons, and product details into follower DMs.</p>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs">
+                <span class="font-bold text-slate-800 block mb-0.5">Content Publishing</span>
+                <span class="text-slate-500 text-[11px] font-mono">instagram_content_publish</span>
+                <p class="text-slate-500 text-[11px] mt-1">Publishes approved images and video reels directly to your Instagram profile.</p>
             </div>
         </div>
     </div>
