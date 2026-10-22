@@ -11,5 +11,4 @@ venv
 env
 tempmediaStorage
 media
-staticfiles
 *.log

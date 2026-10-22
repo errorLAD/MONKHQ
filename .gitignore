@@ -11,7 +11,6 @@ __pycache__/
 *.sqlite3
 db.sqlite3
 media/
-staticfiles/
 
 # Vercel & Deployment
 .vercel/
