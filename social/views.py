@@ -1,3 +1,4 @@
+import base64
 import datetime
 import hashlib
 import hmac
@@ -9,7 +10,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
@@ -320,3 +321,189 @@ def meta_webhook_view(request):
         return JsonResponse({'status': 'EVENT_RECEIVED'}, status=200)
 
     return HttpResponse('Method Not Allowed', status=405)
+
+
+def _parse_signed_request(signed_request, secret):
+    """
+    Decodes and validates a Meta signed_request.
+    Returns (data_dict, error_string).
+    """
+    if not signed_request or '.' not in signed_request:
+        return None, "Invalid signed_request format."
+
+    try:
+        encoded_sig, payload = signed_request.split('.', 1)
+    except ValueError:
+        return None, "Malformed signed_request."
+
+    # Pad base64 strings to multiple of 4
+    rem_sig = len(encoded_sig) % 4
+    if rem_sig:
+        encoded_sig += '=' * (4 - rem_sig)
+    rem_payload = len(payload) % 4
+    if rem_payload:
+        payload += '=' * (4 - rem_payload)
+
+    try:
+        sig = base64.urlsafe_b64decode(encoded_sig.encode('utf-8'))
+        decoded_payload = base64.urlsafe_b64decode(payload.encode('utf-8'))
+        data = json.loads(decoded_payload.decode('utf-8'))
+    except Exception as e:
+        return None, f"Failed to decode base64 signed_request: {e}"
+
+    if data.get('algorithm', '').upper() != 'HMAC-SHA256':
+        return None, f"Unsupported algorithm: {data.get('algorithm')}"
+
+    # Verify signature using META_APP_SECRET if configured
+    if secret:
+        raw_payload = signed_request.split('.', 1)[1].encode('ascii')
+        expected_sig = hmac.new(secret.encode('utf-8'), raw_payload, hashlib.sha256).digest()
+        if not hmac.compare_digest(sig, expected_sig):
+            return None, "Signature verification failed."
+
+    return data, None
+
+
+@csrf_exempt
+def meta_deauthorize_view(request):
+    """
+    Handles Meta (Instagram / Facebook) Deauthorization Callback.
+    - GET: Returns HTTP 200 with an official compliance status page/JSON.
+    - POST: Validates signed_request from Meta, identifies user_id,
+            marks SocialAccount as disconnected, revokes tokens, and updates health.
+    """
+    if request.method == 'GET':
+        if request.headers.get('accept') == 'application/json':
+            return JsonResponse({
+                'status': 'OPERATIONAL',
+                'service': 'MonkHQ Meta Deauthorization Callback',
+                'endpoint': '/social/deauthorize/',
+                'methods': ['GET', 'POST'],
+                'timestamp': timezone.now().isoformat()
+            }, status=200)
+        return render(request, 'social/deauthorize.html', {
+            'status': 'OPERATIONAL',
+            'endpoint': request.build_absolute_uri(),
+        })
+
+    elif request.method == 'POST':
+        signed_request = request.POST.get('signed_request')
+        if not signed_request:
+            try:
+                body_data = json.loads(request.body.decode('utf-8'))
+                signed_request = body_data.get('signed_request')
+            except Exception:
+                signed_request = None
+
+        if not signed_request:
+            logger.warning("Meta deauthorize callback received without signed_request.")
+            return JsonResponse({'error': 'Missing signed_request parameter'}, status=400)
+
+        app_secret = getattr(settings, 'META_APP_SECRET', '')
+        data, err = _parse_signed_request(signed_request, app_secret)
+        if err or not data:
+            logger.warning(f"Meta deauthorize validation error: {err}")
+            return JsonResponse({'error': err or 'Invalid signature'}, status=403)
+
+        user_id = str(data.get('user_id') or '')
+        if not user_id:
+            logger.warning("Meta deauthorize payload missing user_id.")
+            return JsonResponse({'error': 'Missing user_id in payload'}, status=400)
+
+        # Disconnect all social accounts matching this account_id
+        matched_accounts = SocialAccount.objects.filter(account_id=user_id)
+        count = 0
+        for acc in matched_accounts:
+            acc.is_connected = False
+            acc.save(update_fields=['is_connected'])
+            if hasattr(acc, 'health'):
+                acc.health.meta_status = 'DISCONNECTED'
+                acc.health.last_error = 'User removed MonkHQ authorization in Meta settings.'
+                acc.health.save(update_fields=['meta_status', 'last_error', 'updated_at'])
+            if hasattr(acc, 'meta_token'):
+                acc.meta_token.delete()
+            count += 1
+
+        logger.info(f"Meta deauthorization completed for user_id={user_id}. {count} account(s) disconnected.")
+        return JsonResponse({
+            'status': 'success',
+            'user_id': user_id,
+            'accounts_disconnected': count,
+            'message': 'Account deauthorized and disconnected successfully.'
+        }, status=200)
+
+    return HttpResponse('Method Not Allowed', status=405)
+
+
+@csrf_exempt
+def meta_data_deletion_view(request):
+    """
+    Handles Meta User Data Deletion Request Callback (GDPR / Privacy Compliance).
+    - GET: Shows instructions and compliance documentation.
+    - POST: Verifies signed_request from Meta, marks account data for deletion,
+            and returns required JSON with confirmation URL and code.
+    """
+    if request.method == 'GET':
+        if request.headers.get('accept') == 'application/json':
+            return JsonResponse({
+                'status': 'OPERATIONAL',
+                'service': 'MonkHQ Meta Data Deletion Callback',
+                'endpoint': '/social/data-deletion/',
+                'methods': ['GET', 'POST'],
+                'timestamp': timezone.now().isoformat()
+            }, status=200)
+        return render(request, 'social/data_deletion.html', {
+            'endpoint': request.build_absolute_uri(),
+        })
+
+    elif request.method == 'POST':
+        signed_request = request.POST.get('signed_request')
+        if not signed_request:
+            try:
+                body_data = json.loads(request.body.decode('utf-8'))
+                signed_request = body_data.get('signed_request')
+            except Exception:
+                signed_request = None
+
+        if not signed_request:
+            return JsonResponse({'error': 'Missing signed_request parameter'}, status=400)
+
+        app_secret = getattr(settings, 'META_APP_SECRET', '')
+        data, err = _parse_signed_request(signed_request, app_secret)
+        if err or not data:
+            return JsonResponse({'error': err or 'Invalid signature'}, status=403)
+
+        user_id = str(data.get('user_id') or 'unknown')
+        confirmation_code = f"del_{user_id}_{secrets.token_hex(4)}"
+
+        matched_accounts = SocialAccount.objects.filter(account_id=user_id)
+        for acc in matched_accounts:
+            acc.is_connected = False
+            acc.save(update_fields=['is_connected'])
+            if hasattr(acc, 'meta_token'):
+                acc.meta_token.delete()
+            if hasattr(acc, 'health'):
+                acc.health.meta_status = 'DISCONNECTED'
+                acc.health.last_error = f'Data deletion requested (Code: {confirmation_code})'
+                acc.health.save(update_fields=['meta_status', 'last_error', 'updated_at'])
+
+        status_url = request.build_absolute_uri(f"/social/deletion-status/?code={confirmation_code}")
+        logger.info(f"Meta data deletion request completed for user_id={user_id}. Confirmation code: {confirmation_code}")
+
+        return JsonResponse({
+            'url': status_url,
+            'confirmation_code': confirmation_code
+        }, status=200)
+
+    return HttpResponse('Method Not Allowed', status=405)
+
+
+def meta_deletion_status_view(request):
+    """
+    Renders public confirmation of data deletion status.
+    """
+    code = request.GET.get('code', 'N/A')
+    return render(request, 'social/deletion_status.html', {
+        'confirmation_code': code,
+        'timestamp': timezone.now(),
+    })

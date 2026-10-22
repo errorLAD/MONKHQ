@@ -533,3 +533,124 @@ class InstagramOAuthAndWebhookTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json(), {'status': 'EVENT_RECEIVED'})
         self.assertEqual(AutomationExecution.objects.count(), 0)
+
+
+class MetaDeauthorizeAndDataDeletionTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username="deauth_creator",
+            email="deauth@monkhq.in",
+            password="SecurePassword123!",
+            role="CREATOR"
+        )
+        self.workspace = Workspace.objects.create(
+            name="Deauth Workspace",
+            slug="deauth-workspace",
+            owner=self.user,
+            workspace_type="CREATOR"
+        )
+        self.account = SocialAccount.objects.create(
+            workspace=self.workspace,
+            platform='INSTAGRAM',
+            account_id='meta_user_999888',
+            account_name='Deauth Test IG',
+            username='deauth_ig_test',
+            is_connected=True
+        )
+        self.meta_token = MetaToken.objects.create(
+            social_account=self.account,
+            access_token_encrypted='encrypted_dummy_token'
+        )
+        self.health = AccountHealth.objects.create(
+            social_account=self.account,
+            meta_status='HEALTHY'
+        )
+        self.secret = 'test_meta_app_secret_321'
+
+    def _create_signed_request(self, user_id, secret=None):
+        import base64
+        secret = secret or self.secret
+        payload_data = {'algorithm': 'HMAC-SHA256', 'user_id': user_id, 'issued_at': 1700000000}
+        payload_json = json.dumps(payload_data)
+        encoded_payload = base64.urlsafe_b64encode(payload_json.encode('utf-8')).decode('utf-8').rstrip('=')
+        sig = hmac.new(secret.encode('utf-8'), encoded_payload.encode('ascii'), hashlib.sha256).digest()
+        encoded_sig = base64.urlsafe_b64encode(sig).decode('utf-8').rstrip('=')
+        return f"{encoded_sig}.{encoded_payload}"
+
+    def test_deauthorize_get_renders_200_ok(self):
+        """GET /social/deauthorize/ renders 200 OK HTML for browser testers."""
+        response = self.client.get(reverse('meta_deauthorize'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Deauthorization Callback")
+        self.assertContains(response, "Endpoint Status: Healthy")
+
+    def test_deauthorize_get_json_accept_header(self):
+        """GET /social/deauthorize/ returns JSON when Accept: application/json."""
+        response = self.client.get(reverse('meta_deauthorize'), HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['status'], 'OPERATIONAL')
+
+    @override_settings(META_APP_SECRET='test_meta_app_secret_321')
+    def test_deauthorize_post_valid_signed_request(self):
+        """POST /social/deauthorize/ with valid signature disconnects account and revokes token."""
+        signed_request = self._create_signed_request('meta_user_999888')
+        response = self.client.post(
+            reverse('meta_deauthorize'),
+            data={'signed_request': signed_request}
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(data['user_id'], 'meta_user_999888')
+        self.assertEqual(data['accounts_disconnected'], 1)
+
+        self.account.refresh_from_db()
+        self.assertFalse(self.account.is_connected)
+        self.health.refresh_from_db()
+        self.assertEqual(self.health.meta_status, 'DISCONNECTED')
+        self.assertFalse(MetaToken.objects.filter(social_account=self.account).exists())
+
+    @override_settings(META_APP_SECRET='test_meta_app_secret_321')
+    def test_deauthorize_post_invalid_signature_rejected(self):
+        """POST /social/deauthorize/ with invalid signature returns 403."""
+        signed_request = self._create_signed_request('meta_user_999888', secret='wrong_secret')
+        response = self.client.post(
+            reverse('meta_deauthorize'),
+            data={'signed_request': signed_request}
+        )
+        self.assertEqual(response.status_code, 403)
+        self.account.refresh_from_db()
+        self.assertTrue(self.account.is_connected)
+
+    def test_deauthorize_post_missing_signed_request(self):
+        """POST /social/deauthorize/ without signed_request returns 400."""
+        response = self.client.post(reverse('meta_deauthorize'), data={})
+        self.assertEqual(response.status_code, 400)
+
+    def test_data_deletion_get_renders_200_ok(self):
+        """GET /social/data-deletion/ returns 200 OK instructions."""
+        response = self.client.get(reverse('meta_data_deletion'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Data Deletion Request")
+
+    @override_settings(META_APP_SECRET='test_meta_app_secret_321')
+    def test_data_deletion_post_valid_returns_status_url_and_code(self):
+        """POST /social/data-deletion/ returns required Meta URL and confirmation code."""
+        signed_request = self._create_signed_request('meta_user_999888')
+        response = self.client.post(
+            reverse('meta_data_deletion'),
+            data={'signed_request': signed_request}
+        )
+        self.assertEqual(response.status_code, 200)
+        json_data = response.json()
+        self.assertIn('url', json_data)
+        self.assertIn('confirmation_code', json_data)
+        self.assertTrue(json_data['confirmation_code'].startswith('del_meta_user_999888'))
+
+    def test_deletion_status_get_renders_200_ok(self):
+        """GET /social/deletion-status/ renders 200 OK."""
+        response = self.client.get(reverse('meta_deletion_status') + '?code=del_123')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "del_123")
+

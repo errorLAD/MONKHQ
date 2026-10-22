@@ -1,0 +1,82 @@
+{% extends "base_public.html" %}
+
+{% block title %}User Data Deletion Callback — MonkHQ{% endblock %}
+{% block meta_description %}MonkHQ official Meta user data deletion instructions and callback endpoint.{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-xl w-full bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 p-8 text-white relative">
+            <div class="flex items-center space-x-3 mb-2">
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md">
+                    <i data-lucide="lock" class="w-6 h-6 text-white"></i>
+                </span>
+                <span class="text-xs uppercase font-extrabold tracking-wider bg-white/20 px-3 py-1 rounded-full backdrop-blur-md">
+                    Privacy & GDPR Compliance
+                </span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight">Data Deletion Request</h1>
+            <p class="text-sm text-purple-100 mt-1">Official callback endpoint for Meta User Data Erasure</p>
+        </div>
+
+        <!-- Body Content -->
+        <div class="p-8 space-y-6">
+            <!-- Status Pill -->
+            <div class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
+                <div class="flex items-center space-x-3">
+                    <span class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    <div>
+                        <p class="text-sm font-bold text-emerald-900">Endpoint Status: Healthy</p>
+                        <p class="text-xs text-emerald-700">Meta automated data deletion callback active</p>
+                    </div>
+                </div>
+                <span class="text-xs font-mono font-bold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">
+                    HTTP 200
+                </span>
+            </div>
+
+            <!-- Details -->
+            <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                <p>
+                    Under Meta Platform Terms and global data protection regulations (GDPR/CCPA), users have the right to request deletion of any personal data associated with their Instagram or Facebook accounts.
+                </p>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-2">
+                    <h3 class="font-bold text-slate-800 text-sm">How to Request Data Deletion:</h3>
+                    <ol class="list-decimal list-inside space-y-1.5 text-xs text-slate-600">
+                        <li>Go to your Facebook / Instagram account's <strong>Settings & Privacy</strong>.</li>
+                        <li>Click <strong>Apps and Websites</strong> and find <strong>MonkHQ</strong>.</li>
+                        <li>Click <strong>Remove</strong> and check the option to request deletion of data.</li>
+                        <li>Meta will automatically trigger this endpoint and send you a confirmation link with your tracking code.</li>
+                    </ol>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 font-mono text-xs text-slate-700 break-all">
+                    <span class="text-slate-400 block mb-1 uppercase font-sans font-semibold text-[10px]">Configured Callback URL</span>
+                    {{ endpoint }}
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
+                <a href="/" class="flex-1 inline-flex items-center justify-center px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition-all shadow-md hover:shadow-lg">
+                    <i data-lucide="home" class="w-4 h-4 mr-2"></i> Return to MonkHQ
+                </a>
+                <a href="/social/deauthorize/" class="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition-colors">
+                    <i data-lucide="shield" class="w-4 h-4 mr-2"></i> Deauthorization Info
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-slate-50 px-8 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+            <span>&copy; MonkHQ. All rights reserved.</span>
+            <span>GDPR & Privacy Compliant</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
