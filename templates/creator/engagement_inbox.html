@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Unified Inbox & Handoff — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="h-[calc(100vh-120px)] flex bg-white rounded-xl border border-[#E4E7EC] shadow-card overflow-hidden">
+    
+    <!-- Left Conversation List -->
+    <div class="w-80 border-r border-[#E4E7EC] flex flex-col bg-[#FAFAFB]">
+        <div class="p-3.5 border-b border-[#E4E7EC] bg-[#FAFAFB]">
+            <h2 class="text-[0.8rem] font-[650] text-[#101828]">Unified Inbox</h2>
+            <div class="mt-1.5 flex gap-1.5">
+                <span class="px-2 py-0.5 bg-[#EEF2FF] text-[#2451FF] font-bold text-[0.6rem] rounded-full border border-[#D6E0FF]">All Chats</span>
+                <span class="px-2 py-0.5 bg-[#FFFAEB] text-[#B54708] font-bold text-[0.6rem] rounded-full border border-[#FEDF89]">Human Handoff</span>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto divide-y divide-[#E4E7EC]">
+            {% for conv in conversations %}
+                <a href="?conv_id={{ conv.id }}" class="p-3 block hover:bg-white transition {% if selected_conv and selected_conv.id == conv.id %}bg-white border-l-2 border-[#2451FF]{% endif %}">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[0.72rem] font-bold text-[#101828]">@{{ conv.contact.username }}</span>
+                        <span class="px-1.5 py-0.5 text-[0.58rem] font-semibold rounded {% if conv.status == 'HANDOFF' %}bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]{% else %}bg-[#EEF2FF] text-[#2451FF] border border-[#D6E0FF]{% endif %}">
+                            {{ conv.status }}
+                        </span>
+                    </div>
+                    <p class="text-[0.66rem] text-[#98A2B3] truncate mt-0.5">{{ conv.updated_at|timesince }} ago</p>
+                </a>
+            {% empty %}
+                <div class="p-4 text-center text-[0.72rem] text-[#98A2B3]">No conversations in inbox.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Right Chat Thread -->
+    <div class="flex-1 flex flex-col bg-white">
+        {% if selected_conv %}
+            <div class="p-3.5 border-b border-[#E4E7EC] bg-[#FAFAFB] flex items-center justify-between">
+                <div>
+                    <h3 class="text-[0.8rem] font-[650] text-[#101828]">@{{ selected_conv.contact.username }}</h3>
+                    <p class="text-[0.66rem] text-[#475467]">Lead Score: <span class="font-bold text-[#2451FF] tabular-nums">{{ selected_conv.contact.lead_score }} pts</span> | {{ selected_conv.contact.tags }}</p>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="conversation_id" value="{{ selected_conv.id }}">
+                    <input type="hidden" name="action" value="toggle_handoff">
+                    <button type="submit" class="px-2.5 py-1 bg-white border border-[#D0D5DD] text-[#344054] font-semibold text-[0.7rem] rounded-lg hover:bg-[#FAFAFB]">
+                        {% if selected_conv.status == 'HANDOFF' %}Resume AI Agent{% else %}Takeover (Human Handoff){% endif %}
+                    </button>
+                </form>
+            </div>
+
+            <!-- Message Scroll -->
+            <div class="flex-1 p-4 overflow-y-auto space-y-3 bg-[#F7F8FA]">
+                {% for msg in selected_conv.messages.all %}
+                    <div class="flex flex-col {% if msg.sender_type == 'CONTACT' %}items-start{% else %}items-end{% endif %}">
+                        <div class="max-w-md p-3 rounded-xl text-[0.72rem] font-medium shadow-card {% if msg.sender_type == 'CONTACT' %}bg-white text-[#101828] border border-[#E4E7EC]{% elif msg.sender_type == 'BOT' %}bg-[#2451FF] text-white{% else %}bg-[#101828] text-white{% endif %}">
+                            <p class="font-bold text-[0.6rem] opacity-75 mb-0.5">
+                                {% if msg.sender_type == 'CONTACT' %}@{{ selected_conv.contact.username }}{% elif msg.sender_type == 'BOT' %}AI Bot Assistant{% else %}Human Agent{% endif %}
+                            </p>
+                            <p>{{ msg.content }}</p>
+                        </div>
+                        <span class="text-[0.6rem] text-[#98A2B3] mt-0.5 tabular-nums">{{ msg.sent_at|time:"H:i" }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Reply Box -->
+            <form method="POST" class="p-3 border-t border-[#E4E7EC] bg-white flex gap-2">
+                {% csrf_token %}
+                <input type="hidden" name="conversation_id" value="{{ selected_conv.id }}">
+                <input type="hidden" name="action" value="send_reply">
+                <input type="text" name="message_text" placeholder="Type DM reply..." class="flex-1 px-3 py-1.5 border border-[#D0D5DD] rounded-lg text-[0.72rem] font-medium focus:ring-2 focus:ring-[#2451FF]" required>
+                <button type="submit" class="px-4 py-1.5 bg-[#2451FF] hover:bg-[#1939B7] text-white font-semibold text-[0.7rem] rounded-lg shadow-card flex items-center gap-1">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i> Send
+                </button>
+            </form>
+        {% else %}
+            <div class="flex-1 flex items-center justify-center text-[#98A2B3] text-[0.72rem]">
+                Select a conversation from the sidebar to view thread details.
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

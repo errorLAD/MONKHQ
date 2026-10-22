@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+
+{% block title %}Inspiration Library — Creator Growth Studio — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="inspirationLibraryStudio()">
+
+    <!-- Top Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-200">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-xs">
+                    CREATOR ARCHIVE
+                </span>
+                <span class="text-xs font-semibold text-slate-400">Creator Growth Studio</span>
+            </div>
+            <h1 class="text-2xl font-black text-slate-950 tracking-tight mt-1">Inspiration Library</h1>
+            <p class="text-xs text-slate-500 font-medium mt-0.5">
+                Curate breakout reels, high-retention hooks, compelling captions, and personal creator notes in one searchable vault.
+            </p>
+        </div>
+        
+        <div class="flex items-center gap-2.5">
+            <a href="{% url 'creator_viral_finder' %}" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 shadow-xs flex items-center gap-1.5 transition">
+                <i data-lucide="flame" class="w-3.5 h-3.5 text-rose-500"></i>
+                <span>Viral Finder</span>
+            </a>
+            <button @click="openAddModal()" class="px-4 py-2 bg-[#2451FF] hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow flex items-center gap-1.5 transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>+ Save Inspiration</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
+        <form method="GET" class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-xs">
+            <!-- Search Bar -->
+            <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                <input type="text" name="q" value="{{ search_q }}" placeholder="Search by title, hook, caption, tags, or creator handle..." class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-[#2451FF] text-xs font-medium text-slate-900 focus:outline-none transition">
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap items-center gap-2">
+                <select name="source_type" class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 focus:outline-none">
+                    <option value="">All Formats</option>
+                    {% for code, label in source_types %}
+                    <option value="{{ code }}" {% if type_filter == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="category" class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 focus:outline-none">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if cat_filter == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+
+                <a href="?favorite={% if favorite_filter %}0{% else %}1{% endif %}&q={{ search_q }}&source_type={{ type_filter }}&category={{ cat_filter }}" class="px-3 py-2 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 {% if favorite_filter %}bg-amber-50 text-amber-700 border-amber-300{% else %}bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100{% endif %}">
+                    <i data-lucide="star" class="w-3.5 h-3.5 {% if favorite_filter %}text-amber-500 fill-amber-500{% endif %}"></i>
+                    <span>Favorites ({{ favorites_count }})</span>
+                </a>
+
+                <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs">
+                    Search
+                </button>
+
+                {% if search_q or type_filter or cat_filter or favorite_filter %}
+                <a href="{% url 'creator_inspiration_library' %}" class="px-2 text-slate-500 hover:text-slate-800 text-xs font-medium">Reset</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Cards Grid -->
+    {% if items %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for item in items %}
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+            <div class="space-y-3">
+                <!-- Card Header -->
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider
+                            {% if item.source_type == 'URL' %}bg-rose-50 text-rose-700 border border-rose-200
+                            {% elif item.source_type == 'HOOK' %}bg-amber-50 text-amber-700 border border-amber-200
+                            {% elif item.source_type == 'CAPTION' %}bg-blue-50 text-blue-700 border border-blue-200
+                            {% elif item.source_type == 'SCRIPT' %}bg-purple-50 text-purple-700 border border-purple-200
+                            {% else %}bg-slate-100 text-slate-700{% endif %}">
+                            {{ item.get_source_type_display }}
+                        </span>
+                        {% if item.category %}
+                        <span class="text-[10px] font-bold text-slate-400">• {{ item.category }}</span>
+                        {% endif %}
+                    </div>
+
+                    <button @click="toggleFavorite('{{ item.id }}', $event)" class="text-slate-300 hover:text-amber-500 transition p-1" title="Favorite">
+                        <i data-lucide="star" class="w-4 h-4 {% if item.is_favorite %}text-amber-500 fill-amber-500{% endif %}"></i>
+                    </button>
+                </div>
+
+                <!-- Title & Creator Info -->
+                <div>
+                    <h3 class="text-sm font-black text-slate-900 leading-snug">{{ item.title }}</h3>
+                    {% if item.creator_handle %}
+                    <span class="text-[11px] font-semibold text-slate-400">by @{{ item.creator_handle }} ({{ item.platform }})</span>
+                    {% endif %}
+                </div>
+
+                <!-- Hook Text snippet -->
+                {% if item.hook_text %}
+                <div class="p-2.5 bg-amber-50/50 rounded-xl border border-amber-100">
+                    <span class="text-[9px] font-extrabold uppercase text-amber-700 block tracking-wider">Hook Mechanic</span>
+                    <p class="text-xs font-semibold text-slate-800 italic">“{{ item.hook_text }}”</p>
+                </div>
+                {% endif %}
+
+                <!-- Caption Text snippet -->
+                {% if item.caption_text %}
+                <p class="text-xs text-slate-600 line-clamp-3">
+                    <span class="font-bold text-slate-700">Caption: </span>{{ item.caption_text }}
+                </p>
+                {% endif %}
+
+                <!-- Notes -->
+                {% if item.notes %}
+                <p class="text-xs text-slate-500 italic bg-slate-50 p-2 rounded-lg border border-slate-100">
+                    <span class="font-bold text-slate-600 not-italic">Notes: </span>{{ item.notes }}
+                </p>
+                {% endif %}
+
+                <!-- Tags -->
+                {% if item.tags %}
+                <div class="flex items-center gap-1 flex-wrap pt-1">
+                    {% for tag in item.tags.split %}
+                    <span class="text-[10px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">#{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if item.source_url %}
+                <div class="pt-1">
+                    <a href="{{ item.source_url }}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-[#2451FF] font-semibold hover:underline inline-flex items-center gap-1">
+                        <i data-lucide="external-link" class="w-3 h-3"></i>
+                        <span>View Original Reel / Post</span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                <form method="POST" action="{% url 'creator_inspiration_delete_api' item.id %}" onsubmit="return confirm('Remove this inspiration item?');">
+                    {% csrf_token %}
+                    <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition" title="Delete">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </form>
+
+                <!-- Launch Script Studio Bridge -->
+                <a href="{% url 'creator_script_studio' %}?topic={{ item.title|urlencode }}&niche={{ item.category|urlencode }}&notes={{ item.hook_text|default:item.notes|urlencode }}" class="px-3 py-1.5 text-xs font-extrabold rounded-lg bg-[#2451FF] hover:bg-blue-700 text-white flex items-center gap-1.5 shadow-xs transition">
+                    <i data-lucide="video" class="w-3.5 h-3.5"></i>
+                    <span>Launch Script Studio →</span>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if items.has_other_pages %}
+    <div class="flex items-center justify-center gap-2 pt-4">
+        {% if items.has_previous %}
+        <a href="?page={{ items.previous_page_number }}&q={{ search_q }}&source_type={{ type_filter }}&category={{ cat_filter }}&favorite={{ favorite_filter }}" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">Previous</a>
+        {% endif %}
+        <span class="text-xs text-slate-500 font-semibold">Page {{ items.number }} of {{ items.paginator.num_pages }}</span>
+        {% if items.has_next %}
+        <a href="?page={{ items.next_page_number }}&q={{ search_q }}&source_type={{ type_filter }}&category={{ cat_filter }}&favorite={{ favorite_filter }}" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-12 text-center space-y-3">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+            <i data-lucide="bookmark" class="w-6 h-6"></i>
+        </div>
+        <h4 class="text-sm font-bold text-slate-900">Your Inspiration Library is empty</h4>
+        <p class="text-xs text-slate-500 max-w-sm mx-auto">
+            Bookmark viral reels from the Viral Finder, save winning hooks, or add custom concepts using "+ Save Inspiration".
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- ADD INSPIRATION MODAL -->
+    <div x-show="showAddModal" class="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4" @click.away="showAddModal = false">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                    <i data-lucide="bookmark-plus" class="w-4 h-4 text-indigo-600"></i>
+                    <span>Save New Inspiration</span>
+                </h3>
+                <button @click="showAddModal = false" class="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+
+            <form method="POST" action="{% url 'creator_inspiration_add_api' %}" class="space-y-3">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Title / Label *</label>
+                    <input type="text" name="title" required placeholder="e.g. 5 AI Agents Hook by @creator" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Source Type</label>
+                        <select name="source_type" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                            {% for code, label in source_types %}
+                            <option value="{{ code }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Category</label>
+                        <input type="text" name="category" placeholder="Tech & AI, Business, etc." class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Creator Handle (Optional)</label>
+                        <input type="text" name="creator_handle" placeholder="@username" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Platform</label>
+                        <input type="text" name="platform" value="Instagram" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Reel / Video URL (Optional)</label>
+                    <input type="url" name="source_url" placeholder="https://instagram.com/reel/..." class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Hook Line (Optional)</label>
+                    <textarea name="hook_text" rows="2" placeholder="The exact opening 3-second hook that grabbed attention..." class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Personal Notes & Takeaways</label>
+                    <textarea name="notes" rows="2" placeholder="Why this worked, visual format, camera angle..." class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none"></textarea>
+                </div>
+
+                <div class="pt-2 flex items-center justify-end gap-2">
+                    <button type="button" @click="showAddModal = false" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-[#2451FF] hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow">Save to Vault</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function inspirationLibraryStudio() {
+    return {
+        showAddModal: false,
+
+        openAddModal() {
+            this.showAddModal = true;
+        },
+
+        async toggleFavorite(itemId, event) {
+            try {
+                const resp = await fetch(`/creator/growth-studio/inspiration-library/${itemId}/favorite/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+                const data = await resp.json();
+                if (data.status === 'success') {
+                    const icon = event.currentTarget.querySelector('svg') || event.currentTarget.querySelector('i');
+                    if (data.is_favorite) {
+                        icon.classList.add('text-amber-500', 'fill-amber-500');
+                    } else {
+                        icon.classList.remove('text-amber-500', 'fill-amber-500');
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

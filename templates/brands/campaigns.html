@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Brand Campaigns — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Brand Campaigns</h1>
+        <p class="text-sm text-slate-500">Manage campaign objectives, budgets, and creator assignments.</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <div class="divide-y divide-slate-100">
+            {% for campaign in campaigns %}
+                <div class="py-3 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-sm">{{ campaign.name }}</h4>
+                        <p class="text-xs text-slate-500">Objective: {{ campaign.objective }} | Budget: ${{ campaign.budget }}</p>
+                    </div>
+                    <span class="px-2.5 py-1 bg-indigo-100 text-indigo-800 font-bold text-xs rounded-full">{{ campaign.status }}</span>
+                </div>
+            {% empty %}
+                <div class="py-6 text-center text-slate-400 text-xs">No active brand campaigns.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

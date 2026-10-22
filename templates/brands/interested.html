@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Interested Creators — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Interested Creators</h1>
+        <p class="text-sm text-slate-500">Creators who clicked "I'M INTERESTED" on your promotions marketplace listings.</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <div class="divide-y divide-slate-100">
+            {% for item in interests %}
+                <div class="py-4 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-sm">@{{ item.creator.username }}</h4>
+                        <p class="text-xs text-slate-500">Interested in promotion: "{{ item.promotion.title }}"</p>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium">{{ item.created_at|date:"M d, Y" }}</span>
+                </div>
+            {% empty %}
+                <div class="py-6 text-center text-slate-400 text-xs">No creator interest logged yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

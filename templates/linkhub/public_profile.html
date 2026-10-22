@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ link_hub.meta_title|default:link_hub.title }} — MonkHQ Link Hub</title>
+    <meta name="description" content="{{ link_hub.meta_description|default:link_hub.bio }}">
+    <meta property="og:title" content="{{ link_hub.title }}">
+    <meta property="og:description" content="{{ link_hub.bio }}">
+    {% if link_hub.meta_og_image %}
+    <meta property="og:image" content="{{ link_hub.meta_og_image }}">
+    {% endif %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .theme-minimal { background-color: #F8FAFC; color: #0F172A; }
+        .theme-creator { background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%); color: #FFFFFF; }
+        .theme-dark { background-color: #090D16; color: #F8FAFC; }
+        .theme-neon { background: #05050A; color: #38BDF8; }
+        .theme-luxury { background: linear-gradient(180deg, #18181B 0%, #09090B 100%); color: #FEF08A; }
+        .theme-gaming { background: linear-gradient(135deg, #090514 0%, #1A0B2E 100%); color: #A855F7; }
+    </style>
+</head>
+<body class="min-h-screen {% if link_hub.theme == 'CREATOR' %}theme-creator{% elif link_hub.theme == 'DARK' %}theme-dark{% elif link_hub.theme == 'NEON' %}theme-neon{% elif link_hub.theme == 'LUXURY' %}theme-luxury{% elif link_hub.theme == 'GAMING' %}theme-gaming{% else %}theme-minimal{% endif %} flex flex-col items-center py-10 px-4">
+
+    <!-- Main Container -->
+    <div class="max-w-md w-full space-y-6 text-center">
+        
+        <!-- Header & Profile -->
+        <div class="space-y-3">
+            <div class="relative w-24 h-24 mx-auto">
+                {% if link_hub.avatar_url %}
+                    <img src="{{ link_hub.avatar_url }}" alt="{{ link_hub.username }}" class="w-24 h-24 rounded-full object-cover shadow-2xl border-2 border-white/20">
+                {% else %}
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-black text-3xl text-white shadow-2xl border-2 border-white/20">
+                        {{ link_hub.username|slice:":2"|upper }}
+                    </div>
+                {% endif %}
+                {% if link_hub.is_verified %}
+                    <div class="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1 shadow" title="Verified Creator">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="space-y-1">
+                <h1 class="text-xl font-extrabold tracking-tight flex items-center justify-center gap-1.5">
+                    <span>{{ link_hub.title|default:link_hub.username }}</span>
+                </h1>
+                <p class="text-xs opacity-75 font-semibold">@{{ link_hub.username }}</p>
+            </div>
+            
+            {% if link_hub.bio %}
+                <p class="text-xs opacity-90 px-4 leading-relaxed font-medium max-w-sm mx-auto">{{ link_hub.bio }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Social Icons Row -->
+        <div class="flex flex-wrap justify-center gap-2.5 py-1 text-sm">
+            {% if link_hub.social_instagram %}
+                <a href="{{ link_hub.social_instagram }}" target="_blank" class="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+            {% endif %}
+            {% if link_hub.social_youtube %}
+                <a href="{{ link_hub.social_youtube }}" target="_blank" class="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition"><i data-lucide="youtube" class="w-4 h-4"></i></a>
+            {% endif %}
+            {% if link_hub.social_facebook %}
+                <a href="{{ link_hub.social_facebook }}" target="_blank" class="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+            {% endif %}
+            {% if link_hub.social_tiktok %}
+                <a href="{{ link_hub.social_tiktok }}" target="_blank" class="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition"><i data-lucide="video" class="w-4 h-4"></i></a>
+            {% endif %}
+            {% if link_hub.social_x %}
+                <a href="{{ link_hub.social_x }}" target="_blank" class="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+            {% endif %}
+            {% if link_hub.social_linkedin %}
+                <a href="{{ link_hub.social_linkedin }}" target="_blank" class="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition"><i data-lucide="linkedin" class="w-4 h-4"></i></a>
+            {% endif %}
+            {% if link_hub.social_whatsapp %}
+                <a href="{{ link_hub.social_whatsapp }}" target="_blank" class="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition"><i data-lucide="message-circle" class="w-4 h-4"></i></a>
+            {% endif %}
+            {% if link_hub.social_github %}
+                <a href="{{ link_hub.social_github }}" target="_blank" class="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition"><i data-lucide="github" class="w-4 h-4"></i></a>
+            {% endif %}
+        </div>
+
+        <!-- Storefront / Blocks List -->
+        <div class="space-y-3.5 pt-2">
+            {% for item in items %}
+                {% if item.item_type == 'CONTACT_FORM' %}
+                    <!-- Lead Capture Contact Form -->
+                    <div class="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-left space-y-3 shadow-lg">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                            <i data-lucide="mail" class="w-4 h-4"></i> Get in Touch
+                        </h3>
+                        <form hx-post="{% url 'linkhub_submit_lead' link_hub_id=link_hub.id %}" hx-swap="outerHTML" class="space-y-2 text-xs text-slate-800">
+                            {% csrf_token %}
+                            <input type="text" name="name" placeholder="Your Name" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="email" name="email" placeholder="Your Email" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="tel" name="phone" placeholder="Phone Number (Optional)" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <textarea name="message" placeholder="Your message..." rows="2" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+
+                {% elif item.item_type == 'EMAIL_SIGNUP' %}
+                    <!-- Email Subscription Block -->
+                    <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-left space-y-2 shadow-lg">
+                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <i data-lucide="bell" class="w-4 h-4 text-emerald-400"></i> Subscribe for Updates
+                        </h3>
+                        <form hx-post="{% url 'linkhub_subscribe_email' link_hub_id=link_hub.id %}" hx-swap="outerHTML" class="flex gap-2">
+                            {% csrf_token %}
+                            <input type="email" name="email" placeholder="Enter your email" required class="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none">
+                            <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition">
+                                Subscribe
+                            </button>
+                        </form>
+                    </div>
+
+                {% elif item.item_type == 'DIGITAL_PRODUCT' %}
+                    <!-- Digital Product Block -->
+                    <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-left flex items-center justify-between shadow-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400">
+                                <i data-lucide="file-down" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-extrabold text-white">{{ item.title }}</h3>
+                                <p class="text-[11px] font-bold text-amber-300">⚡ Digital Download • {% if item.price %}${{ item.price }}{% else %}FREE{% endif %}</p>
+                            </div>
+                        </div>
+                        {% if item.digital_product %}
+                            <a href="{% url 'digital_download' digital_id=item.digital_product.id %}" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl shadow transition flex items-center gap-1">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i> Download
+                            </a>
+                        {% endif %}
+                    </div>
+
+                {% else %}
+                    <!-- Link / Physical Product / Affiliate Block -->
+                    <a href="{% url 'linkhub_click' item_id=item.id %}" target="_blank" class="block w-full p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 hover:bg-white/20 transition transform hover:-translate-y-0.5 shadow-xl text-left flex items-center justify-between group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 group-hover:scale-105 transition">
+                                {% if item.item_type == 'PRODUCT' %}
+                                    <i data-lucide="shopping-bag" class="w-5 h-5 text-emerald-400"></i>
+                                {% elif item.item_type == 'AFFILIATE_PRODUCT' %}
+                                    <i data-lucide="external-link" class="w-5 h-5 text-rose-400"></i>
+                                {% else %}
+                                    <i data-lucide="{{ item.icon|default:'link' }}" class="w-5 h-5"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-extrabold text-white group-hover:text-blue-300 transition">{{ item.title }}</h3>
+                                {% if item.price %}
+                                    <p class="text-[11px] font-bold text-emerald-400">${{ item.price }} {% if item.affiliate_marketplace %}<span class="text-slate-400">• {{ item.affiliate_marketplace }}</span>{% endif %}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1 text-xs font-bold opacity-75 group-hover:opacity-100 transition">
+                            <span>{{ item.cta_text|default:"View" }}</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </div>
+                    </a>
+                {% endif %}
+            {% empty %}
+                <div class="p-8 text-center text-xs opacity-60 bg-white/5 rounded-2xl border border-white/10">
+                    No active link items created yet.
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Footer -->
+        <div class="pt-6 text-center">
+            <a href="{% url 'creator_login' %}" class="inline-flex items-center gap-1.5 text-[10px] font-bold opacity-60 hover:opacity-100 transition">
+                <span>Powered by</span>
+                <span class="font-black text-blue-400">MONKHQ</span>
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

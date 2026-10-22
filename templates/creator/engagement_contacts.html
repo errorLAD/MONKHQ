@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Contacts & Lead CRM — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">Contacts & Lead CRM</h1>
+            <p class="text-sm text-slate-500">Track Instagram/Facebook audience interactions, lead scores, and purchase histories.</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    <th class="p-4">Contact</th>
+                    <th class="p-4">Platform</th>
+                    <th class="p-4">Lead Score</th>
+                    <th class="p-4">Tags</th>
+                    <th class="p-4">Purchases</th>
+                    <th class="p-4">Total Spent</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-xs font-medium">
+                {% for contact in contacts %}
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-4 font-bold text-slate-900">@{{ contact.username }}</td>
+                        <td class="p-4 text-slate-600">{{ contact.platform }}</td>
+                        <td class="p-4 font-bold text-purple-600">{{ contact.lead_score }} pts</td>
+                        <td class="p-4"><span class="px-2 py-0.5 bg-purple-50 text-purple-700 rounded font-semibold">{{ contact.tags }}</span></td>
+                        <td class="p-4 text-slate-700 font-bold">{{ contact.purchase_count }}</td>
+                        <td class="p-4 text-emerald-600 font-extrabold">${{ contact.total_spent }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-slate-400">No contacts captured yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

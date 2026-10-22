@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Knowledge Base — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">AI Knowledge Base</h1>
+            <p class="text-sm text-slate-500">Upload FAQs, product catalogs, and policies to train your AI sales assistant without hallucination.</p>
+        </div>
+    </div>
+
+    <!-- Upload Document Form -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-sm font-bold text-slate-900 mb-4">Add Document / FAQ Knowledge Source</h3>
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Document Title</label>
+                    <input type="text" name="title" placeholder="e.g. Return Policy 2026 or Audio Spec Sheet" class="w-full px-3 py-2 border rounded-xl text-xs font-medium focus:ring-2 focus:ring-purple-600" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Source Type</label>
+                    <select name="doc_type" class="w-full px-3 py-2 border rounded-xl text-xs font-semibold focus:ring-2 focus:ring-purple-600">
+                        <option value="TEXT">Plain Text</option>
+                        <option value="FAQ">FAQ Q&A Pair</option>
+                        <option value="PRODUCT_INFO">Product Catalog Info</option>
+                        <option value="URL">Website URL Scraping</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Knowledge Content</label>
+                <textarea name="content" rows="3" placeholder="Paste exact product specifications, pricing policies, or shipping info..." class="w-full p-3 border rounded-xl text-xs font-medium focus:ring-2 focus:ring-purple-600" required></textarea>
+            </div>
+
+            <button type="submit" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-md">
+                Add Knowledge Source
+            </button>
+        </form>
+    </div>
+
+    <!-- Document List -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 font-bold text-sm text-slate-900">Configured Knowledge Documents</div>
+        <div class="divide-y divide-slate-100">
+            {% for doc in docs %}
+                <div class="p-5 flex items-center justify-between hover:bg-slate-50">
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-900">{{ doc.title }}</h4>
+                        <p class="text-xs text-slate-500 mt-1 line-clamp-2">{{ doc.content }}</p>
+                    </div>
+                    <span class="px-2.5 py-1 bg-purple-50 text-purple-700 text-[10px] font-bold rounded-full border border-purple-200">
+                        {{ doc.doc_type }}
+                    </span>
+                </div>
+            {% empty %}
+                <div class="p-8 text-center text-slate-400 text-sm">No documents added yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

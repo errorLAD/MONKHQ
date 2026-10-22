@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Workspace Governance — Super Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">WORKSPACE GOVERNANCE</h1>
+            <p class="text-xs text-slate-500">Inspect multi-tenant workspace isolation, storage limits, and active status.</p>
+        </div>
+    </div>
+
+    <!-- Workspaces Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b border-slate-100 font-extrabold text-xs text-slate-950 uppercase tracking-wider">
+            All System Workspaces ({{ workspaces.count }})
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                        <th class="p-3.5">Workspace Name</th>
+                        <th class="p-3.5">Owner</th>
+                        <th class="p-3.5">Slug</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5">Created</th>
+                        <th class="p-3.5">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-xs font-medium">
+                    {% for ws in workspaces %}
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3.5 font-bold text-slate-950">{{ ws.name }}</td>
+                            <td class="p-3.5 text-blue-600 font-bold">@{{ ws.owner.username }}</td>
+                            <td class="p-3.5 text-slate-500 font-mono text-[11px]">{{ ws.slug }}</td>
+                            <td class="p-3.5">
+                                {% if ws.is_active %}
+                                    <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 font-black text-[10px] rounded-full border border-emerald-200">
+                                        ● ACTIVE
+                                    </span>
+                                {% else %}
+                                    <span class="px-2.5 py-0.5 bg-amber-50 text-amber-700 font-black text-[10px] rounded-full border border-amber-200">
+                                        ○ SUSPENDED
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3.5 text-slate-400 font-mono text-[11px]">{{ ws.created_at|date:"M d, Y" }}</td>
+                            <td class="p-3.5">
+                                <form method="POST" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="workspace_id" value="{{ ws.id }}">
+                                    {% if ws.is_active %}
+                                        <input type="hidden" name="action" value="suspend">
+                                        <button type="submit" onclick="return confirm('Suspend workspace {{ ws.name }}?')" class="px-2 py-1 bg-amber-50 text-amber-700 text-[10px] font-bold rounded-lg border border-amber-200">
+                                            Suspend
+                                        </button>
+                                    {% else %}
+                                        <input type="hidden" name="action" value="reactivate">
+                                        <button type="submit" class="px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-lg border border-emerald-200">
+                                            Reactivate
+                                        </button>
+                                    {% endif %}
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6" class="p-8 text-center text-xs text-slate-400">No workspaces registered yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

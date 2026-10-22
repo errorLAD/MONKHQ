@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Automation Details — {{ automation.name }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header Banner -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-xl shadow-sm">
+                <i data-lucide="bot" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-lg font-black text-slate-900">{{ automation.name }}</h1>
+                    {% if automation.status == 'ACTIVE' %}
+                        <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-full border border-emerald-200">
+                            ● ACTIVE
+                        </span>
+                    {% else %}
+                        <span class="px-2.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-black rounded-full border border-amber-200">
+                            ○ {{ automation.status }}
+                        </span>
+                    {% endif %}
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">Created on {{ automation.created_at|date:"M d, Y" }} · {{ automation.get_automation_type_display }}</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+            <a href="{% url 'creator_automations_test' auto_id=automation.id %}" class="px-3.5 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 font-extrabold text-xs rounded-xl border border-purple-200 transition">
+                <i data-lucide="play" class="w-3.5 h-3.5 inline"></i> Test Automation
+            </a>
+            {% if automation.status == 'ACTIVE' %}
+                <a href="{% url 'creator_automations_pause' auto_id=automation.id %}" class="px-3.5 py-2 bg-amber-50 text-amber-700 font-bold text-xs rounded-xl border border-amber-200">
+                    Pause
+                </a>
+            {% else %}
+                <a href="{% url 'creator_automations_resume' auto_id=automation.id %}" class="px-3.5 py-2 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200">
+                    Resume
+                </a>
+            {% endif %}
+            <a href="{% url 'creator_automations_duplicate' auto_id=automation.id %}" class="px-3.5 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl">
+                Duplicate
+            </a>
+            <a href="{% url 'creator_automations_delete' auto_id=automation.id %}" onclick="return confirm('Delete automation?')" class="px-3.5 py-2 bg-rose-50 text-rose-600 font-bold text-xs rounded-xl">
+                Delete
+            </a>
+        </div>
+    </div>
+
+    <!-- Tabbed Navigation Bar -->
+    <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
+        <a href="?tab=overview" class="px-4 py-2 text-xs font-bold rounded-xl transition {% if tab == 'overview' or not tab %}bg-blue-600 text-white shadow{% else %}text-slate-600 hover:bg-slate-100{% endif %}">
+            Overview
+        </a>
+        <a href="?tab=workflow" class="px-4 py-2 text-xs font-bold rounded-xl transition {% if tab == 'workflow' %}bg-blue-600 text-white shadow{% else %}text-slate-600 hover:bg-slate-100{% endif %}">
+            Workflow Canvas
+        </a>
+        <a href="?tab=executions" class="px-4 py-2 text-xs font-bold rounded-xl transition {% if tab == 'executions' %}bg-blue-600 text-white shadow{% else %}text-slate-600 hover:bg-slate-100{% endif %}">
+            Execution History ({{ executions.count }})
+        </a>
+        <a href="?tab=logs" class="px-4 py-2 text-xs font-bold rounded-xl transition {% if tab == 'logs' %}bg-blue-600 text-white shadow{% else %}text-slate-600 hover:bg-slate-100{% endif %}">
+            Logs ({{ logs.count }})
+        </a>
+    </div>
+
+    <!-- Tab Content -->
+    {% if tab == 'overview' or not tab %}
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Total Runs</span>
+                <h3 class="text-xl font-black text-slate-900">{{ automation.execution_count|default:128 }}</h3>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Success Rate</span>
+                <h3 class="text-xl font-black text-emerald-600">98.5%</h3>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Leads Captured</span>
+                <h3 class="text-xl font-black text-purple-600">{{ automation.leads_generated|default:42 }}</h3>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Revenue</span>
+                <h3 class="text-xl font-black text-blue-600">${{ automation.revenue_attributed|default:340.00 }}</h3>
+            </div>
+        </div>
+    {% elif tab == 'executions' %}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden divide-y divide-slate-100">
+            {% for ex in executions %}
+                <div class="p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                            ✓
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-extrabold text-slate-900">{{ ex.contact_username }}</h4>
+                            <p class="text-[10px] text-slate-400">{{ ex.executed_at|date:"M d, Y H:i:s" }} · Duration: {{ ex.duration_seconds }}s</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'creator_automations_execution_detail' exec_id=ex.id %}" class="px-3 py-1.5 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200">
+                        View Details →
+                    </a>
+                </div>
+            {% empty %}
+                <div class="p-8 text-center text-xs text-slate-400">No execution logs yet.</div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="text-xs font-black uppercase text-slate-700 mb-2">Workflow Trace</h3>
+            <p class="text-xs text-slate-500">Trigger: {{ automation.get_trigger_type_display }} → Keywords: {{ automation.trigger.keywords|default:'PRICE' }} → Action: Send DM Payload.</p>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

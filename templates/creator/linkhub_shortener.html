@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Smart Short Links — Link Hub{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">Smart Short Links</h1>
+            <p class="text-xs text-slate-500">Create branded short links (e.g. monkhq.in/go/camera) with click tracking.</p>
+        </div>
+        <a href="{% url 'creator_linkhub_main' %}" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200 transition">
+            ← Back to Editor
+        </a>
+    </div>
+
+    <!-- Create Short Link Form -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Create Short Link</h3>
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Link Title</label>
+                <input type="text" name="title" placeholder="e.g. 📷 Sony Camera Promo" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Custom Slug (/go/slug)</label>
+                <input type="text" name="slug" placeholder="camera" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Destination URL</label>
+                <input type="url" name="target_url" placeholder="https://amazon.com/..." required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div class="md:col-span-3">
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">
+                    + Create Short Link
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Short Links List -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden divide-y divide-slate-100">
+        {% for link in short_links %}
+            <div class="p-4 flex items-center justify-between hover:bg-slate-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                        <i data-lucide="zap" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-extrabold text-slate-900">{{ link.title }}</h4>
+                        <p class="text-[11px] text-blue-600 font-bold">/go/{{ link.slug }} → <span class="text-slate-500 font-medium">{{ link.target_url }}</span></p>
+                    </div>
+                </div>
+                <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
+                    {{ link.click_count }} Clicks
+                </span>
+            </div>
+        {% empty %}
+            <div class="p-8 text-center text-xs text-slate-400 font-semibold">No short links created yet.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

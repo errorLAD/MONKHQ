@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Promotions Analytics — Creator Portal{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">PROMOTIONS & DEAL PERFORMANCE</h1>
+            <p class="text-xs text-slate-500">Track click conversions, affiliate link sales, and brand sponsorship earnings.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+            <span class="text-[10px] font-black uppercase text-slate-400">Total Sponsorship Revenue</span>
+            <h3 class="text-2xl font-black text-emerald-600">₹0.00</h3>
+            <span class="text-[10px] text-slate-400">Active Brand Deals</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+            <span class="text-[10px] font-black uppercase text-slate-400">Applications Approved</span>
+            <h3 class="text-2xl font-black text-purple-600">0</h3>
+            <span class="text-[10px] text-slate-400">Brand Partnership Acceptance</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+            <span class="text-[10px] font-black uppercase text-slate-400">Affiliate Commission Earned</span>
+            <h3 class="text-2xl font-black text-blue-600">₹0.00</h3>
+            <span class="text-[10px] text-slate-400">From Promoted Product Links</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

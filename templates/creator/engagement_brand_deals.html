@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Brand Deals — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">Brand Deals & Active Collaborations</h1>
+            <p class="text-sm text-slate-500">Track brand offers, campaign deliverables, approval statuses, and payments.</p>
+        </div>
+        <a href="{% url 'creator_promotions_find' %}" class="px-4 py-2 bg-purple-600 text-white font-bold text-xs rounded-xl hover:bg-purple-700">
+            Find New Brand Deals
+        </a>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="divide-y divide-slate-100">
+            {% for deal in deals %}
+                <div class="p-6 flex items-center justify-between hover:bg-slate-50">
+                    <div class="space-y-1">
+                        <h3 class="text-base font-bold text-slate-900">{{ deal.promotion.title }}</h3>
+                        <p class="text-xs text-slate-500">Brand: <span class="font-bold text-indigo-600">@{{ deal.brand.username }}</span> | Deliverables: {{ deal.promotion.deliverables_required }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-black text-emerald-600">${{ deal.agreed_amount }}</p>
+                        <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800">
+                            {{ deal.status }}
+                        </span>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="p-8 text-center text-slate-400 text-sm">
+                    No active brand deals yet. Browse the Marketplace to apply!
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

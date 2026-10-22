@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Billing & Subscriptions — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="{ selectedCountry: 'IN' }">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Billing & Multi-Tier Regional Plans</h1>
+        <p class="text-sm text-slate-500">Choose from Silver, Gold, or Plus regional plans with server-calculated GST/tax.</p>
+    </div>
+
+    <!-- Country Selector -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
+        <div>
+            <span class="text-xs font-black text-slate-950 uppercase tracking-wider block">Billing Region & Currency</span>
+            <span class="text-[11px] text-slate-500">Server-enforced local pricing rules & applicable GST/tax.</span>
+        </div>
+        <select x-model="selectedCountry" class="px-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-[#6b46f0]">
+            <option value="IN">🇮🇳 India — INR (₹)</option>
+            <option value="US">🇺🇸 United States — USD ($)</option>
+            <option value="GB">🇬🇧 United Kingdom — USD ($)</option>
+            <option value="CA">🇨🇦 Canada — USD ($)</option>
+            <option value="AU">🇦🇺 Australia — USD ($)</option>
+        </select>
+    </div>
+
+    <!-- 3-Tier Regional Pricing Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- SILVER PLAN -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+                <div class="inline-block px-2.5 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-black uppercase rounded-full">
+                    Starter
+                </div>
+                <h3 class="text-xl font-extrabold text-slate-900">SILVER</h3>
+                <p class="text-3xl font-black text-slate-950" x-text="selectedCountry === 'IN' ? '₹99' : '$5'">₹99<span class="text-xs font-normal text-slate-400">/mo</span></p>
+                <ul class="text-xs font-medium text-slate-600 space-y-2 pt-2 border-t border-slate-100">
+                    <li>✓ 1,000 Automated DMs / mo</li>
+                    <li>✓ 5 Active Automations</li>
+                    <li>✓ Storefront Link Hub</li>
+                    <li>✓ Basic Analytics</li>
+                </ul>
+            </div>
+            <a :href="'/billing/checkout/?plan=silver&country=' + selectedCountry" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow text-center block transition">
+                Subscribe Silver →
+            </a>
+        </div>
+
+        <!-- GOLD PLAN -->
+        <div class="bg-white p-6 rounded-2xl border-2 border-[#6b46f0] shadow-md space-y-4 flex flex-col justify-between relative">
+            <span class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-gradient-to-r from-[#6b46f0] to-[#e93d9a] text-white text-[9px] font-black uppercase tracking-wider rounded-full shadow">
+                MOST POPULAR
+            </span>
+            <div class="space-y-3 pt-1">
+                <div class="inline-block px-2.5 py-0.5 bg-purple-50 text-purple-700 text-[10px] font-black uppercase rounded-full">
+                    Growth Choice
+                </div>
+                <h3 class="text-xl font-extrabold text-slate-900">GOLD</h3>
+                <p class="text-3xl font-black text-[#6b46f0]" x-text="selectedCountry === 'IN' ? '₹199' : '$10'">₹199<span class="text-xs font-normal text-slate-400">/mo</span></p>
+                <ul class="text-xs font-medium text-slate-600 space-y-2 pt-2 border-t border-slate-100">
+                    <li>✓ 5,000 Automated DMs / mo</li>
+                    <li>✓ 15 Active Automations</li>
+                    <li>✓ Re-trigger Engine</li>
+                    <li>✓ AI Sales Assistant</li>
+                </ul>
+            </div>
+            <a :href="'/billing/checkout/?plan=gold&country=' + selectedCountry" class="w-full py-2.5 bg-gradient-to-r from-[#6b46f0] to-[#e93d9a] hover:opacity-95 text-white font-extrabold text-xs rounded-xl shadow text-center block transition">
+                Upgrade to Gold →
+            </a>
+        </div>
+
+        <!-- PLUS / PLATINUM PLAN -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+                <div class="inline-block px-2.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-black uppercase rounded-full border border-amber-200">
+                    Maximum Power
+                </div>
+                <h3 class="text-xl font-extrabold text-slate-900">PLUS / GOLD+</h3>
+                <p class="text-3xl font-black text-amber-600" x-text="selectedCountry === 'IN' ? '₹399' : '$20'">₹399<span class="text-xs font-normal text-slate-400">/mo</span></p>
+                <ul class="text-xs font-medium text-slate-600 space-y-2 pt-2 border-t border-slate-100">
+                    <li>✓ 25,000 Automated DMs / mo</li>
+                    <li>✓ 50 Active Automations</li>
+                    <li>✓ Unlimited AI Knowledge Base</li>
+                    <li>✓ Priority Support & Webhooks</li>
+                </ul>
+            </div>
+            <a :href="'/billing/checkout/?plan=plus&country=' + selectedCountry" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow text-center block transition">
+                Upgrade to Plus →
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Automation Templates Gallery — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">AUTOMATION TEMPLATES GALLERY</h1>
+            <p class="text-xs text-slate-500">Deploy high-converting social commerce blueprints in one click.</p>
+        </div>
+        <a href="{% url 'creator_automations_create' %}" class="px-4 py-2 bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow">
+            + Custom Automation
+        </a>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+        {% for tpl in templates %}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition p-5 space-y-4 flex flex-col justify-between group">
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                            <i data-lucide="{{ tpl.icon }}" class="w-5 h-5"></i>
+                        </div>
+                        <span class="px-2.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-full">
+                            {{ tpl.category }}
+                        </span>
+                    </div>
+
+                    <div>
+                        <h3 class="font-extrabold text-sm text-slate-900 group-hover:text-blue-600 transition">{{ tpl.title }}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed mt-1 font-medium">{{ tpl.description }}</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-[11px] text-slate-600 font-semibold space-y-1">
+                        <div>Trigger: <strong>{{ tpl.trigger }}</strong></div>
+                        <div>Keywords: <strong class="text-blue-600">{{ tpl.keywords }}</strong></div>
+                    </div>
+                </div>
+
+                <a href="{% url 'creator_automations_template_use' template_id=tpl.id %}" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow transition text-center flex items-center justify-center gap-1.5">
+                    <i data-lucide="zap" class="w-3.5 h-3.5"></i> Use Template
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

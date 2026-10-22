@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Webhook Endpoints & Logs — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Webhook Endpoints & Logs</h1>
+        <p class="text-sm text-slate-500">Configure outbound webhook endpoints for live event notifications.</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <div class="divide-y divide-slate-100">
+            {% for ep in endpoints %}
+                <div class="py-4 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-sm">{{ ep.target_url }}</h4>
+                        <p class="text-xs text-slate-500">Events: {{ ep.events }}</p>
+                    </div>
+                    <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">ACTIVE</span>
+                </div>
+            {% empty %}
+                <div class="py-6 text-center text-slate-400 text-xs">No webhooks configured.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

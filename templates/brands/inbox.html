@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Brand Inbox — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Brand Direct Messages & Creator Inquiries</h1>
+        <p class="text-sm text-slate-500">Communicate directly with interested creators and active deal partners.</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <div class="divide-y divide-slate-100">
+            {% for conv in conversations %}
+                <div class="py-3 flex justify-between items-center">
+                    <h4 class="font-bold text-slate-900 text-sm">@{{ conv.contact.username }}</h4>
+                    <span class="px-2.5 py-1 bg-indigo-100 text-indigo-800 font-bold text-xs rounded-full">{{ conv.status }}</span>
+                </div>
+            {% empty %}
+                <div class="py-6 text-center text-slate-400 text-xs">No active brand conversations.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Regional Pricing & Currency Controls — Super Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">REGIONAL PRICING & TAX MATRIX</h1>
+            <p class="text-xs text-slate-500">Configure regional plan prices (India: ₹99 INR, International: $5 USD) and tax treatment.</p>
+        </div>
+    </div>
+
+    <!-- Pricing Summary Table -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Regional Prices Table -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="p-4 bg-slate-50 border-b border-slate-100 font-extrabold text-xs text-slate-950 uppercase tracking-wider flex items-center justify-between">
+                <span>Active Regional Prices Matrix</span>
+                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-full">Server-Enforced</span>
+            </div>
+            
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase">
+                        <th class="p-3.5">Plan</th>
+                        <th class="p-3.5">Region</th>
+                        <th class="p-3.5">Currency</th>
+                        <th class="p-3.5">Price / Month</th>
+                        <th class="p-3.5">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium">
+                    {% for rp in regional_prices %}
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3.5 font-bold text-slate-950">{{ rp.plan.name }}</td>
+                            <td class="p-3.5">
+                                {% if rp.region_code == 'IN' %}
+                                    <span class="px-2 py-0.5 bg-amber-50 text-amber-700 font-black text-[10px] rounded-full border border-amber-200">🇮🇳 INDIA</span>
+                                {% else %}
+                                    <span class="px-2 py-0.5 bg-blue-50 text-blue-700 font-black text-[10px] rounded-full border border-blue-200">🌐 INTERNATIONAL</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3.5 font-mono text-[11px] font-bold text-slate-700">{{ rp.currency }}</td>
+                            <td class="p-3.5 font-black text-emerald-600 text-sm">{{ rp.display_price }}</td>
+                            <td class="p-3.5">
+                                <form method="POST" class="flex items-center gap-1.5">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="update_regional_price">
+                                    <input type="hidden" name="price_id" value="{{ rp.id }}">
+                                    <input type="number" step="0.01" name="price_monthly" value="{{ rp.price_monthly }}" required class="w-20 px-2 py-1 border border-slate-300 rounded-lg text-xs font-bold">
+                                    <button type="submit" class="px-2.5 py-1 bg-slate-900 text-white font-bold text-[10px] rounded-lg">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="p-8 text-center text-xs text-slate-400">No regional prices configured.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tax Rates Table -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="p-4 bg-slate-50 border-b border-slate-100 font-extrabold text-xs text-slate-950 uppercase tracking-wider">
+                Configured Tax Rates & GST
+            </div>
+
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase">
+                        <th class="p-3.5">Country Code</th>
+                        <th class="p-3.5">Tax Name</th>
+                        <th class="p-3.5">Rate Percent</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium">
+                    {% for tr in tax_rates %}
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3.5 font-bold font-mono text-slate-950">{{ tr.country_code }}</td>
+                            <td class="p-3.5 text-purple-600 font-bold">{{ tr.tax_name }}</td>
+                            <td class="p-3.5 font-black text-emerald-600">{{ tr.rate_percent }}%</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3" class="p-8 text-center text-xs text-slate-400">No tax rates configured.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Platform Cross-Channel Analytics</h1>
+        <p class="text-sm text-slate-500">Reach, comments, DMs, leads, sales, CTR, and campaign ROI.</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+        <h3 class="text-base font-bold text-slate-900 mb-2">Analytics Export</h3>
+        <p class="text-xs text-slate-500 mb-4">Export full performance reports for accounting and brand reports.</p>
+        <button onclick="alert('Exporting CSV analytics report...');" class="px-5 py-2 bg-purple-600 text-white font-bold text-xs rounded-xl shadow">
+            Export CSV Report
+        </button>
+    </div>
+</div>
+{% endblock %}

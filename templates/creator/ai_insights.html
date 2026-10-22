@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Business Insights — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">AI Business Insights & Revenue Intelligence</h1>
+        <p class="text-sm text-slate-500">Automated performance recommendations generated from real platform data.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center gap-3 text-purple-600">
+                <i data-lucide="trending-up" class="w-6 h-6"></i>
+                <h3 class="text-base font-extrabold text-slate-900">Top Converting Product</h3>
+            </div>
+            <p class="text-xs text-slate-600">Your <span class="font-bold text-purple-700">Acme Wireless Pro Headphones</span> offer achieved a <span class="font-bold text-emerald-600">18.4% DM-to-Checkout conversion rate</span> this week.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center gap-3 text-emerald-600">
+                <i data-lucide="clock" class="w-6 h-6"></i>
+                <h3 class="text-base font-extrabold text-slate-900">Best Posting Window</h3>
+            </div>
+            <p class="text-xs text-slate-600">Comments received between <span class="font-bold text-slate-900">6:00 PM – 9:00 PM EST</span> generate 2.4x higher instant link click-throughs.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

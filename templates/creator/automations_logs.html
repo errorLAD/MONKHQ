@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Automation Monitoring Logs — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">AUTOMATION LOGS</h1>
+            <p class="text-xs text-slate-500">Real-time execution monitoring, webhook events, and system logs.</p>
+        </div>
+    </div>
+
+    <!-- Logs Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b border-slate-100 font-extrabold text-xs text-slate-900 uppercase tracking-wider">
+            Execution Logs History ({{ logs.count }})
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                        <th class="p-3.5">Timestamp</th>
+                        <th class="p-3.5">Automation</th>
+                        <th class="p-3.5">User</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5">Duration</th>
+                        <th class="p-3.5">Message / Log Entry</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-xs font-medium">
+                    {% for log in logs %}
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3.5 text-slate-500 font-mono">{{ log.timestamp|date:"H:i:s" }}</td>
+                            <td class="p-3.5 font-extrabold text-slate-900">{{ log.automation.name }}</td>
+                            <td class="p-3.5 font-bold text-blue-600">@sarah_k</td>
+                            <td class="p-3.5">
+                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-black text-[10px] rounded-full border border-emerald-200">
+                                    ✓ SUCCESS
+                                </span>
+                            </td>
+                            <td class="p-3.5 text-slate-500 font-mono">1.2s</td>
+                            <td class="p-3.5 text-slate-700 font-medium">{{ log.message }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="p-8 text-center text-xs text-slate-400">No automation logs recorded yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Subscriptions & Billing — Super Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">SUBSCRIPTIONS & BILLING AUDIT</h1>
+            <p class="text-xs text-slate-500">Manage plan subscriptions, MRR/ARR financial metrics, limit overrides, and active status.</p>
+        </div>
+    </div>
+
+    <!-- Subscriptions Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b border-slate-100 font-extrabold text-xs text-slate-950 uppercase tracking-wider">
+            Active Workspace Subscriptions ({{ subscriptions.count }})
+        </div>
+        <table class="w-full text-left border-collapse text-xs">
+            <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase">
+                    <th class="p-3.5">Workspace</th>
+                    <th class="p-3.5">Plan</th>
+                    <th class="p-3.5">Price</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5">Renewal</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for sub in subscriptions %}
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3.5 font-bold text-slate-950">{{ sub.workspace.name }}</td>
+                        <td class="p-3.5 font-black text-purple-700 uppercase">{{ sub.plan.name }}</td>
+                        <td class="p-3.5 font-black text-emerald-600">${{ sub.plan.price_monthly|floatformat:2 }}/mo</td>
+                        <td class="p-3.5">
+                            {% if sub.status == 'ACTIVE' %}
+                                <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 font-black text-[10px] rounded-full border border-emerald-200">ACTIVE</span>
+                            {% else %}
+                                <span class="px-2.5 py-0.5 bg-rose-50 text-rose-700 font-black text-[10px] rounded-full border border-rose-200">CANCELLED</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-3.5 text-slate-400 font-mono text-[11px]">{{ sub.current_period_end|date:"M d, Y" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="p-8 text-center text-xs text-slate-400">No subscriptions active.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

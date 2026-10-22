@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#f5f5fa] scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>{% block title %}MonkHQ — Turn Public Comments into Private Sales{% endblock %}</title>
+    
+    <!-- Primary Meta Tags & SEO -->
+    <meta name="title" content="MonkHQ — Turn Public Comments into Private Sales">
+    <meta name="description" content="{% block meta_description %}MonkHQ automates Instagram & Facebook DM conversations from comments, stories, and reels. Convert followers into paying customers with AI-powered comment-to-DM funnels.{% endblock %}">
+    <meta name="keywords" content="Instagram automation, comment to DM, social media sales, creator monetization, Facebook automation, DM marketing, lead generation, MonkHQ">
+    <meta name="author" content="MonkHQ">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#6b46f0">
+    <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <meta property="og:site_name" content="MonkHQ">
+    <meta property="og:title" content="MonkHQ — Turn Public Comments into Private Sales">
+    <meta property="og:description" content="Catch public comments on Instagram and Facebook the second they land, reply instantly, and quietly move conversations into private DMs that close as sales.">
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}/static/css/style.css">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <meta name="twitter:title" content="MonkHQ — Turn Public Comments into Private Sales">
+    <meta name="twitter:description" content="Automate Instagram and Facebook comments to high-converting private DM sales conversations in seconds.">
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}/static/css/style.css">
+
+    <!-- SVG Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%236b46f0'/><stop offset='100%25' stop-color='%23e93d9a'/></linearGradient></defs><rect width='100' height='100' rx='25' fill='url(%23g)'/><text x='50%25' y='68%25' font-family='sans-serif' font-weight='900' font-size='56' fill='%23ffffff' text-anchor='middle'>M</text><circle cx='82' cy='18' r='12' fill='%23f43f5e' stroke='%23ffffff' stroke-width='4'/></svg>">
+
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen bg-[#f5f5fa] text-slate-900 antialiased selection:bg-purple-500 selection:text-white">
+
+    <!-- Flash Alert Messages -->
+    {% if messages %}
+        <div class="max-w-md mx-auto w-full pt-4 px-4 space-y-2">
+            {% for message in messages %}
+                <div class="p-3.5 rounded-xl text-xs font-bold border flex items-center justify-between shadow-md
+                    {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700 border-emerald-200
+                    {% elif message.tags == 'error' %}bg-rose-50 text-rose-700 border-rose-200
+                    {% elif message.tags == 'warning' %}bg-amber-50 text-amber-700 border-amber-200
+                    {% else %}bg-blue-50 text-blue-700 border-blue-200{% endif %}">
+                    <span>{{ message }}</span>
+                    <button onclick="this.parentElement.remove()" class="text-base leading-none">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Public View Area -->
+    {% block content %}{% endblock %}
+    {% block auth_content %}{% endblock %}
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

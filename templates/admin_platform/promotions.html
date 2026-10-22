@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Promotions Marketplace Audit — Super Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">PROMOTIONS MARKETPLACE AUDIT</h1>
+            <p class="text-xs text-slate-500">Approve, reject, pause, or audit brand campaign promotions.</p>
+        </div>
+    </div>
+
+    <!-- Promotions Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b border-slate-100 font-extrabold text-xs text-slate-950 uppercase tracking-wider">
+            All Marketplace Promotions ({{ promotions.count }})
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                        <th class="p-3.5">Title</th>
+                        <th class="p-3.5">Brand</th>
+                        <th class="p-3.5">Compensation</th>
+                        <th class="p-3.5">Commission</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-xs font-medium">
+                    {% for p in promotions %}
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3.5 font-bold text-slate-950">{{ p.title }}</td>
+                            <td class="p-3.5 text-blue-600 font-bold">{{ p.brand.company_name }}</td>
+                            <td class="p-3.5 text-emerald-600 font-black">₹{{ p.compensation|floatformat:2 }}</td>
+                            <td class="p-3.5 font-bold text-purple-600">{{ p.commission_rate }}%</td>
+                            <td class="p-3.5">
+                                {% if p.status == 'ACTIVE' %}
+                                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-black text-[10px] rounded-full border border-emerald-200">ACTIVE</span>
+                                {% elif p.status == 'REJECTED' %}
+                                    <span class="px-2 py-0.5 bg-rose-50 text-rose-700 font-black text-[10px] rounded-full border border-rose-200">REJECTED</span>
+                                {% else %}
+                                    <span class="px-2 py-0.5 bg-amber-50 text-amber-700 font-black text-[10px] rounded-full border border-amber-200">{{ p.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3.5">
+                                <div class="flex items-center gap-1.5">
+                                    <form method="POST" class="inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="promo_id" value="{{ p.id }}">
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-lg border border-emerald-200">Approve</button>
+                                    </form>
+                                    <form method="POST" class="inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="promo_id" value="{{ p.id }}">
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="px-2 py-1 bg-rose-50 text-rose-700 text-[10px] font-bold rounded-lg border border-rose-200">Reject</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6" class="p-8 text-center text-xs text-slate-400">No promotions listed yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

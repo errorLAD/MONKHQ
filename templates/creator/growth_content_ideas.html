@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+
+{% block title %}Content Idea Generator — Creator Growth Studio — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="contentIdeaStudio()">
+
+    <!-- Top Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-200">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs">
+                    BATCH IDEATION ENGINE
+                </span>
+                <span class="text-xs font-semibold text-slate-400">Creator Growth Studio</span>
+            </div>
+            <h1 class="text-2xl font-black text-slate-950 tracking-tight mt-1">Content Idea Generator</h1>
+            <p class="text-xs text-slate-500 font-medium mt-0.5">
+                Generate high-converting Reel concepts in batches using Google Gemini, grounded in your voice profile and authentic niche mechanics.
+            </p>
+        </div>
+        
+        <div class="flex items-center gap-2.5">
+            <a href="{% url 'creator_script_studio' %}" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 shadow-xs flex items-center gap-1.5 transition">
+                <i data-lucide="video" class="w-3.5 h-3.5 text-blue-600"></i>
+                <span>AI Script Studio</span>
+            </a>
+            <a href="{% url 'creator_content_calendar' %}" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 shadow-xs flex items-center gap-1.5 transition">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-sky-600"></i>
+                <span>Content Calendar</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Batch Generator Card -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 relative overflow-hidden">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-slate-900">Batch Concept Generator</h2>
+                    <p class="text-[11px] text-slate-500">Configure parameters below to generate 3-5 original video angles at once</p>
+                </div>
+            </div>
+
+            {% if voice_profile and voice_profile.is_active %}
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
+                <i data-lucide="mic" class="w-3.5 h-3.5 text-emerald-600"></i>
+                <span>Voice Persona Linked</span>
+            </div>
+            {% else %}
+            <a href="{% url 'creator_voice_profile' %}" class="inline-flex items-center gap-1 text-[11px] text-amber-600 font-bold hover:underline">
+                <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Set up Voice Profile →
+            </a>
+            {% endif %}
+        </div>
+
+        <form @submit.prevent="generateBatch()" class="space-y-4">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Niche -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Niche</label>
+                    <select x-model="genForm.niche" class="w-full text-xs font-medium rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none transition">
+                        {% for n in niches %}
+                        <option value="{{ n }}">{{ n }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Sub-niche -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Sub-Niche or Specific Focus</label>
+                    <input type="text" x-model="genForm.sub_niche" placeholder="e.g. AI Automation Agencies, SaaS growth" class="w-full text-xs font-medium rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none transition">
+                </div>
+
+                <!-- Target Audience -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Target Audience</label>
+                    <input type="text" x-model="genForm.target_audience" placeholder="e.g. Freelancers, agency owners, 20-30yo creators" class="w-full text-xs font-medium rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none transition">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Language -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Language</label>
+                    <select x-model="genForm.language" class="w-full text-xs font-medium rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none transition">
+                        <option value="ENGLISH">English</option>
+                        <option value="HINGLISH">Hinglish (Hindi + English)</option>
+                        <option value="HINDI">Hindi (हिंदी)</option>
+                    </select>
+                </div>
+
+                <!-- Content Objective -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Content Objective</label>
+                    <select x-model="genForm.objective" class="w-full text-xs font-medium rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none transition">
+                        {% for code, label in objectives %}
+                        <option value="{{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Ideas Count -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Batch Size</label>
+                    <select x-model="genForm.count" class="w-full text-xs font-medium rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none transition">
+                        <option value="3">3 Ideas (Fast)</option>
+                        <option value="4" selected>4 Ideas (Recommended)</option>
+                        <option value="5">5 Ideas (Deep)</option>
+                    </select>
+                </div>
+
+                <!-- AI Token Optimization Options -->
+                <div class="flex flex-col justify-end space-y-1.5 pt-1">
+                    <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                        <input type="checkbox" x-model="genForm.use_voice_profile" class="rounded text-[#2451FF] focus:ring-0">
+                        <span>Apply Voice Profile</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                        <input type="checkbox" x-model="genForm.use_context" class="rounded text-[#2451FF] focus:ring-0">
+                        <span>Use Library Context</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-2 flex items-center justify-between">
+                <span class="text-[11px] text-slate-400">
+                    <i data-lucide="zap" class="w-3 h-3 inline text-amber-500"></i> Optimized single-turn batch prompt (reduces token overhead by ~65%)
+                </span>
+                <button type="submit" :disabled="isGenerating" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-xs rounded-xl shadow flex items-center gap-2 transition disabled:opacity-50">
+                    <template x-if="isGenerating">
+                        <span class="flex items-center gap-2">
+                            <svg class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                            </svg>
+                            <span>Generating Batch with Gemini...</span>
+                        </span>
+                    </template>
+                    <template x-if="!isGenerating">
+                        <span class="flex items-center gap-1.5">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            <span>Generate Ideas Batch</span>
+                        </span>
+                    </template>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Live Generated Ideas Container (If any generated in this session) -->
+    <div x-show="generatedIdeas.length > 0" class="space-y-3" style="display: none;">
+        <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                <span>Freshly Generated Ideas (<span x-text="generatedIdeas.length"></span>)</span>
+            </h3>
+            <button @click="generatedIdeas = []" class="text-xs text-slate-400 hover:text-slate-600 font-semibold">Clear Batch</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <template x-for="(idea, idx) in generatedIdeas" :key="idx">
+                <div class="bg-gradient-to-br from-amber-50/50 via-white to-white rounded-2xl border border-amber-200/80 p-5 shadow-xs space-y-3 flex flex-col justify-between hover:border-amber-300 transition">
+                    <div class="space-y-2">
+                        <div class="flex items-start justify-between gap-2">
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-100 text-amber-800" x-text="idea.suggested_format || 'Talking Head'"></span>
+                            <span class="text-[10px] text-slate-400 font-medium" x-text="'Angle #' + (idx + 1)"></span>
+                        </div>
+                        <h4 class="text-sm font-black text-slate-950 leading-snug" x-text="idea.title"></h4>
+                        <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-[9px] font-extrabold uppercase text-slate-400 block tracking-wider">Opening Hook</span>
+                            <p class="text-xs font-semibold text-slate-800 italic" x-text="'“' + idea.hook + '”'"></p>
+                        </div>
+                        <div class="text-[11px] text-slate-600">
+                            <span class="font-bold text-slate-700">Content Angle: </span>
+                            <span x-text="idea.content_angle"></span>
+                        </div>
+                        <div class="text-[11px] text-slate-600 flex items-center gap-1">
+                            <span class="font-bold text-slate-700">Call to Action: </span>
+                            <span class="text-blue-600 font-medium" x-text="idea.cta"></span>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <button @click="saveIdea(idea, idx)" :disabled="idea.isSaved" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center gap-1 transition disabled:bg-emerald-50 disabled:text-emerald-700 disabled:border-emerald-200">
+                            <template x-if="idea.isSaved">
+                                <span class="flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Saved</span>
+                            </template>
+                            <template x-if="!idea.isSaved">
+                                <span class="flex items-center gap-1"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i> Save Idea</span>
+                            </template>
+                        </button>
+
+                        <a :href="'{% url 'creator_script_studio' %}?topic=' + encodeURIComponent(idea.title) + '&niche=' + encodeURIComponent(genForm.niche) + '&notes=' + encodeURIComponent(idea.hook)" class="px-3 py-1.5 text-xs font-extrabold rounded-lg bg-[#2451FF] hover:bg-blue-700 text-white flex items-center gap-1 transition shadow-xs">
+                            <i data-lucide="video" class="w-3.5 h-3.5"></i>
+                            <span>Send to Script Studio →</span>
+                        </a>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Saved Ideas Library Section -->
+    <div class="space-y-4 pt-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
+            <div>
+                <h3 class="text-base font-black text-slate-950 flex items-center gap-2">
+                    <i data-lucide="bookmark" class="w-4 h-4 text-amber-500"></i>
+                    <span>Saved Ideas Library</span>
+                    <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">{{ total_ideas_count }}</span>
+                </h3>
+                <p class="text-[11px] text-slate-500">Your curated concepts ready for scripting and calendar planning</p>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <form method="GET" class="flex flex-wrap items-center gap-2 text-xs">
+                <input type="text" name="q" value="{{ search_q }}" placeholder="Search ideas & hooks..." class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 focus:outline-none focus:border-[#2451FF] w-44">
+                
+                <select name="niche" class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none">
+                    <option value="">All Niches</option>
+                    {% for n in niches %}
+                    <option value="{{ n }}" {% if niche_filter == n %}selected{% endif %}>{{ n }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="language" class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none">
+                    <option value="">All Languages</option>
+                    <option value="ENGLISH" {% if lang_filter == 'ENGLISH' %}selected{% endif %}>English</option>
+                    <option value="HINGLISH" {% if lang_filter == 'HINGLISH' %}selected{% endif %}>Hinglish</option>
+                    <option value="HINDI" {% if lang_filter == 'HINDI' %}selected{% endif %}>Hindi</option>
+                </select>
+
+                <button type="submit" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs">
+                    Filter
+                </button>
+                {% if search_q or niche_filter or lang_filter %}
+                <a href="{% url 'creator_content_ideas' %}" class="px-2.5 py-1.5 text-xs text-slate-500 hover:text-slate-800">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        {% if saved_ideas %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for idea in saved_ideas %}
+            <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase bg-slate-100 text-slate-700">
+                            {{ idea.niche }}
+                        </span>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[9px] font-bold text-slate-400">{{ idea.language }}</span>
+                            <button @click="toggleFavorite('{{ idea.id }}', $event)" class="text-slate-300 hover:text-amber-500 transition ml-1">
+                                <i data-lucide="star" class="w-4 h-4 {% if idea.is_favorite %}text-amber-500 fill-amber-500{% endif %}"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <h4 class="text-sm font-black text-slate-900 leading-snug">{{ idea.title }}</h4>
+
+                    {% if idea.hook %}
+                    <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="text-[9px] font-bold uppercase text-slate-400 block tracking-wider">Hook</span>
+                        <p class="text-xs font-semibold text-slate-800 italic">“{{ idea.hook }}”</p>
+                    </div>
+                    {% endif %}
+
+                    {% if idea.content_angle %}
+                    <p class="text-xs text-slate-600 line-clamp-2">
+                        <span class="font-bold text-slate-700">Angle: </span>{{ idea.content_angle }}
+                    </p>
+                    {% endif %}
+
+                    {% if idea.cta %}
+                    <p class="text-[11px] text-blue-600 font-semibold">
+                        <span class="text-slate-500 font-bold">CTA: </span>{{ idea.cta }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <form method="POST" action="{% url 'creator_content_idea_delete_api' idea.id %}" onsubmit="return confirm('Delete this idea?');">
+                        {% csrf_token %}
+                        <button type="submit" class="text-slate-400 hover:text-rose-600 text-xs p-1" title="Delete Idea">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </form>
+
+                    <a href="{% url 'creator_script_studio' %}?topic={{ idea.title|urlencode }}&niche={{ idea.niche|urlencode }}&notes={{ idea.hook|default:idea.content_angle|urlencode }}" class="px-3 py-1.5 text-xs font-extrabold rounded-lg bg-[#2451FF] hover:bg-blue-700 text-white flex items-center gap-1 shadow-xs transition">
+                        <i data-lucide="video" class="w-3 h-3"></i>
+                        <span>Script Studio →</span>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if saved_ideas.has_other_pages %}
+        <div class="flex items-center justify-center gap-2 pt-4">
+            {% if saved_ideas.has_previous %}
+            <a href="?page={{ saved_ideas.previous_page_number }}&q={{ search_q }}&niche={{ niche_filter }}&language={{ lang_filter }}" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">Previous</a>
+            {% endif %}
+            <span class="text-xs text-slate-500 font-semibold">Page {{ saved_ideas.number }} of {{ saved_ideas.paginator.num_pages }}</span>
+            {% if saved_ideas.has_next %}
+            <a href="?page={{ saved_ideas.next_page_number }}&q={{ search_q }}&niche={{ niche_filter }}&language={{ lang_filter }}" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">Next</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-12 text-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mx-auto">
+                <i data-lucide="lightbulb" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-sm font-bold text-slate-900">No content ideas saved yet</h4>
+            <p class="text-xs text-slate-500 max-w-sm mx-auto">
+                Generate your first batch of ideas above, or use the filters to view other niches.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+function contentIdeaStudio() {
+    return {
+        isGenerating: false,
+        genForm: {
+            niche: '{{ niches.0|default:"Tech & AI" }}',
+            sub_niche: '',
+            target_audience: '',
+            language: 'ENGLISH',
+            objective: 'GROWTH',
+            count: 4,
+            use_voice_profile: true,
+            use_context: true
+        },
+        generatedIdeas: [],
+
+        async generateBatch() {
+            this.isGenerating = true;
+            try {
+                const formData = new FormData();
+                formData.append('niche', this.genForm.niche);
+                formData.append('sub_niche', this.genForm.sub_niche);
+                formData.append('target_audience', this.genForm.target_audience);
+                formData.append('language', this.genForm.language);
+                formData.append('objective', this.genForm.objective);
+                formData.append('count', this.genForm.count);
+                formData.append('use_voice_profile', this.genForm.use_voice_profile);
+                formData.append('use_context', this.genForm.use_context);
+
+                const resp = await fetch("{% url 'creator_content_ideas_batch_generate_api' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: formData
+                });
+                const data = await resp.json();
+                if (data.status === 'success') {
+                    this.generatedIdeas = data.ideas.map(i => ({...i, isSaved: false}));
+                    this.$nextTick(() => {
+                        lucide.createIcons();
+                    });
+                } else {
+                    alert(data.message || 'Error generating batch ideas.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Connection error while contacting AI service.');
+            } finally {
+                this.isGenerating = false;
+            }
+        },
+
+        async saveIdea(idea, idx) {
+            try {
+                const resp = await fetch("{% url 'creator_content_idea_save_api' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        title: idea.title,
+                        hook: idea.hook,
+                        content_angle: idea.content_angle,
+                        suggested_format: idea.suggested_format,
+                        target_audience: idea.target_audience,
+                        cta: idea.cta,
+                        niche: this.genForm.niche,
+                        sub_niche: this.genForm.sub_niche,
+                        language: this.genForm.language,
+                        objective: this.genForm.objective
+                    })
+                });
+                const data = await resp.json();
+                if (data.status === 'success') {
+                    this.generatedIdeas[idx].isSaved = true;
+                    this.$nextTick(() => {
+                        lucide.createIcons();
+                    });
+                } else {
+                    alert(data.message || 'Could not save idea');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        },
+
+        async toggleFavorite(ideaId, event) {
+            try {
+                const resp = await fetch(`/creator/growth-studio/content-ideas/${ideaId}/favorite/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+                const data = await resp.json();
+                if (data.status === 'success') {
+                    const icon = event.currentTarget.querySelector('svg') || event.currentTarget.querySelector('i');
+                    if (data.is_favorite) {
+                        icon.classList.add('text-amber-500', 'fill-amber-500');
+                    } else {
+                        icon.classList.remove('text-amber-500', 'fill-amber-500');
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,64 @@
+<aside class="w-64 bg-white text-[#475467] flex-shrink-0 flex flex-col h-screen sticky top-0 border-r border-[#E4E7EC] shadow-card overflow-y-auto">
+    <!-- Header Logo -->
+    <div class="p-4 border-b border-[#E4E7EC] bg-[#FAFAFB]">
+        <a href="{% url 'brand_dashboard' %}" class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-lg bg-[#2451FF] flex items-center justify-center text-white font-bold text-xs shadow-card">
+                M
+            </div>
+            <div>
+                <h1 class="text-[0.8rem] font-bold text-[#101828] leading-none">MONKHQ</h1>
+                <p class="text-[0.6rem] font-semibold text-[#475467] tracking-tight mt-0.5">Brand Marketplace</p>
+            </div>
+        </a>
+    </div>
+
+    <!-- Navigation List -->
+    <nav class="flex-1 px-3 py-3 space-y-4 text-[0.72rem]">
+        <div>
+            <a href="{% url 'brand_dashboard' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]">
+                <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 text-[#2451FF]"></i>
+                <span>OVERVIEW</span>
+            </a>
+        </div>
+
+        <div class="space-y-0.5">
+            <div class="px-2.5 text-[0.58rem] font-bold uppercase tracking-wider text-[#98A2B3] mb-1">PROMOTIONS & MARKETPLACE</div>
+            <a href="{% url 'brand_promotions_list' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium">
+                <i data-lucide="megaphone" class="w-3.5 h-3.5 text-[#2451FF]"></i> My Promotions
+            </a>
+            <a href="{% url 'brand_promotions_create' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium">
+                <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-[#067647]"></i> Create Promotion
+            </a>
+            <a href="{% url 'brand_applications' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium">
+                <i data-lucide="file-text" class="w-3.5 h-3.5 text-[#98A2B3]"></i> Applications
+            </a>
+            <a href="{% url 'brand_interested' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium">
+                <i data-lucide="heart" class="w-3.5 h-3.5 text-[#B42318]"></i> Interested Creators
+            </a>
+            <a href="{% url 'brand_creators_find' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium">
+                <i data-lucide="users" class="w-3.5 h-3.5 text-[#B54708]"></i> Find Creators
+            </a>
+        </div>
+
+
+
+        <div class="space-y-0.5">
+            <div class="px-2.5 text-[0.58rem] font-bold uppercase tracking-wider text-[#98A2B3] mb-1">AUTOMATION & INBOX</div>
+            <a href="{% url 'brand_ai' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#2451FF]"></i> AI Engine
+            </a>
+            <a href="{% url 'brand_inbox' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium">
+                <i data-lucide="inbox" class="w-3.5 h-3.5 text-[#98A2B3]"></i> Inbox
+            </a>
+            <a href="{% url 'brand_linkhub' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium">
+                <i data-lucide="link-2" class="w-3.5 h-3.5 text-[#98A2B3]"></i> Link Hub
+            </a>
+        </div>
+
+        <div class="pt-3 border-t border-[#E4E7EC] space-y-0.5">
+            <a href="{% url 'brand_settings' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium">
+                <i data-lucide="settings" class="w-3.5 h-3.5 text-[#98A2B3]"></i> SETTINGS
+            </a>
+        </div>
+    </nav>
+</aside>

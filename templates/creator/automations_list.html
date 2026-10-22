@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}All Automations — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">AUTOMATIONS</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Build, manage and monitor your social commerce workflows.</p>
+        </div>
+        <div class="flex items-center gap-2.5">
+            <a href="{% url 'creator_automations_canvas' %}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition flex items-center gap-1.5 border border-slate-200">
+                <i data-lucide="workflow" class="w-4 h-4 text-blue-600"></i> Visual Builder
+            </a>
+            <a href="{% url 'creator_automations_create' %}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                <i data-lucide="plus" class="w-4 h-4"></i> Create Automation
+            </a>
+        </div>
+    </div>
+
+    <!-- 6 Real Stats Cards Grid (From PostgreSQL) -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <!-- Card 1 -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">ACTIVE AUTOMATIONS</span>
+            <h3 class="text-lg font-black text-slate-900">{{ active_count }}</h3>
+            <span class="text-[10px] text-emerald-600 font-bold">● {{ paused_count }} Paused</span>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">RUNNING TODAY</span>
+            <h3 class="text-lg font-black text-blue-600">{{ executions_today }}</h3>
+            <span class="text-[10px] text-slate-400 font-medium">Real-time triggers</span>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">SUCCESS RATE</span>
+            <h3 class="text-lg font-black text-emerald-600">{{ success_rate }}%</h3>
+            <span class="text-[10px] text-emerald-600 font-bold">✓ Meta Verified</span>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">FAILED</span>
+            <h3 class="text-lg font-black text-rose-600">{{ failed_executions }}</h3>
+            <span class="text-[10px] text-slate-400 font-medium">Retry queue ready</span>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">LEADS GENERATED</span>
+            <h3 class="text-lg font-black text-purple-600">{{ leads_count }}</h3>
+            <span class="text-[10px] text-purple-600 font-bold">CRM Qualified</span>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">REVENUE ATTRIBUTED</span>
+            <h3 class="text-lg font-black text-slate-900">₹{{ revenue_attributed|floatformat:2 }}</h3>
+            <span class="text-[10px] text-emerald-600 font-bold">Storefront Sales</span>
+        </div>
+    </div>
+
+    <!-- Filters & Search Bar (HTMX Enabled) -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
+        <form hx-get="{% url 'creator_automations_list' %}" hx-trigger="keyup changed delay:300ms, change" hx-target="#automation-cards-container" class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+            
+            <!-- Search Field -->
+            <div class="relative">
+                <input type="text" name="q" value="{{ search_q }}" placeholder="Search automations or keywords..." class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-blue-600">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            </div>
+
+            <!-- Status Filter -->
+            <div>
+                <select name="status" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 bg-white">
+                    <option value="ALL" {% if status_filter == 'ALL' or not status_filter %}selected{% endif %}>Status: All Statuses</option>
+                    <option value="ACTIVE" {% if status_filter == 'ACTIVE' %}selected{% endif %}>● Active</option>
+                    <option value="PAUSED" {% if status_filter == 'PAUSED' %}selected{% endif %}>○ Paused</option>
+                    <option value="DRAFT" {% if status_filter == 'DRAFT' %}selected{% endif %}>◌ Draft</option>
+                    <option value="ERROR" {% if status_filter == 'ERROR' %}selected{% endif %}>⚠ Error</option>
+                    <option value="ARCHIVED" {% if status_filter == 'ARCHIVED' %}selected{% endif %}>□ Archived</option>
+                </select>
+            </div>
+
+            <!-- Type Filter -->
+            <div>
+                <select name="type" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 bg-white">
+                    <option value="ALL" {% if type_filter == 'ALL' or not type_filter %}selected{% endif %}>Type: All Types</option>
+                    <option value="COMMENT_DM" {% if type_filter == 'COMMENT_DM' %}selected{% endif %}>Comment to DM</option>
+                    <option value="AI_SALES" {% if type_filter == 'AI_SALES' %}selected{% endif %}>AI Sales Automation</option>
+                    <option value="RETRIGGER" {% if type_filter == 'RETRIGGER' %}selected{% endif %}>Re-trigger Engine</option>
+                    <option value="FOLLOW" {% if type_filter == 'FOLLOW' %}selected{% endif %}>New Follower</option>
+                    <option value="PRODUCT" {% if type_filter == 'PRODUCT' %}selected{% endif %}>Product Offer</option>
+                    <option value="LEAD" {% if type_filter == 'LEAD' %}selected{% endif %}>Lead Capture</option>
+                </select>
+            </div>
+
+            <!-- Sort By -->
+            <div>
+                <select name="sort" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 bg-white">
+                    <option value="-updated_at" {% if sort_by == '-updated_at' %}selected{% endif %}>Sort: Recently Updated</option>
+                    <option value="created_at" {% if sort_by == 'created_at' %}selected{% endif %}>Recently Created</option>
+                    <option value="execution_count" {% if sort_by == 'execution_count' %}selected{% endif %}>Most Executed</option>
+                    <option value="revenue" {% if sort_by == 'revenue' %}selected{% endif %}>Highest Revenue</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Cards Container (HTMX Target) -->
+    <div id="automation-cards-container">
+        {% include 'creator/partials/automation_cards_partial.html' %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Brand Products — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Brand Products Catalog</h1>
+        <p class="text-sm text-slate-500">Products available for creator promotion and commission attribution.</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <div class="divide-y divide-slate-100">
+            {% for prod in products %}
+                <div class="py-3 flex justify-between items-center">
+                    <h4 class="font-bold text-slate-900 text-sm">{{ prod.name }}</h4>
+                    <span class="text-xs font-black text-emerald-600">${{ prod.price }}</span>
+                </div>
+            {% empty %}
+                <div class="py-6 text-center text-slate-400 text-xs">No products in brand workspace catalog.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

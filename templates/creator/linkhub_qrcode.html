@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}QR Code Generator — Link Hub{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">QR Code Studio</h1>
+            <p class="text-xs text-slate-500">Custom QR code linking directly to your public profile (monkhq.in/@{{ link_hub.username }}).</p>
+        </div>
+        <a href="{% url 'creator_linkhub_main' %}" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200 transition">
+            ← Back to Editor
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        
+        <!-- QR Preview Card -->
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center space-y-6 flex flex-col items-center">
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Live QR Code Preview</h3>
+            
+            <div id="qr-container" class="p-6 rounded-2xl border-4 border-slate-900 shadow-xl" style="background-color: {{ qr_code.bg_color }};">
+                <svg class="w-48 h-48" viewBox="0 0 100 100" fill="{{ qr_code.fg_color }}">
+                    <!-- Stylized QR Code SVG Representation -->
+                    <rect x="10" y="10" width="25" height="25" rx="4" stroke="{{ qr_code.fg_color }}" stroke-width="4" fill="none" />
+                    <rect x="15" y="15" width="15" height="15" rx="2" fill="{{ qr_code.fg_color }}" />
+                    <rect x="65" y="10" width="25" height="25" rx="4" stroke="{{ qr_code.fg_color }}" stroke-width="4" fill="none" />
+                    <rect x="70" y="15" width="15" height="15" rx="2" fill="{{ qr_code.fg_color }}" />
+                    <rect x="10" y="65" width="25" height="25" rx="4" stroke="{{ qr_code.fg_color }}" stroke-width="4" fill="none" />
+                    <rect x="15" y="70" width="15" height="15" rx="2" fill="{{ qr_code.fg_color }}" />
+                    
+                    <rect x="45" y="10" width="10" height="10" />
+                    <rect x="45" y="45" width="10" height="10" />
+                    <rect x="65" y="45" width="10" height="10" />
+                    <rect x="45" y="65" width="10" height="10" />
+                    <rect x="65" y="65" width="25" height="25" />
+                </svg>
+            </div>
+
+            <div class="space-y-1">
+                <p class="text-xs font-bold text-slate-900">Target: /@{{ link_hub.username }}/</p>
+                <p class="text-[11px] text-slate-400 font-semibold">Total Scans: {{ qr_code.scan_count }}</p>
+            </div>
+
+            <button onclick="window.print()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                <i data-lucide="download" class="w-4 h-4"></i> Download High-Res QR Code
+            </button>
+        </div>
+
+        <!-- QR Styling Form -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-900 border-b pb-2">Customization Options</h3>
+            <form method="POST" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Foreground Color</label>
+                    <input type="color" name="fg_color" value="{{ qr_code.fg_color }}" class="w-full h-10 p-1 border rounded-xl cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Background Color</label>
+                    <input type="color" name="bg_color" value="{{ qr_code.bg_color }}" class="w-full h-10 p-1 border rounded-xl cursor-pointer">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow transition">
+                    Save QR Code Styling
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Scheduled Links — Link Hub{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">Scheduled Link Visibility</h1>
+            <p class="text-xs text-slate-500">Automatically activate or hide links based on start and end dates/times.</p>
+        </div>
+        <a href="{% url 'creator_linkhub_main' %}" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200 transition">
+            ← Back to Editor
+        </a>
+    </div>
+
+    <!-- Scheduled Blocks List -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden divide-y divide-slate-100">
+        {% for item in items %}
+            <div class="p-5 space-y-3 hover:bg-slate-50 transition">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                            <i data-lucide="calendar" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-extrabold text-slate-900">{{ item.title }}</h4>
+                            <p class="text-[10px] text-slate-400 font-medium">{{ item.item_type }}</p>
+                        </div>
+                    </div>
+
+                    {% if item.is_currently_visible %}
+                        <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 font-bold text-[10px] rounded-full border border-emerald-200">
+                            ● Currently Visible
+                        </span>
+                    {% else %}
+                        <span class="px-2.5 py-1 bg-amber-50 text-amber-700 font-bold text-[10px] rounded-full border border-amber-200">
+                            ⏸ Scheduled / Inactive
+                        </span>
+                    {% endif %}
+                </div>
+
+                <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 border-t border-slate-100 items-end">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Start Date & Time</label>
+                        <input type="datetime-local" name="start_time" value="{{ item.start_time|date:'Y-m-d\TH:i' }}" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">End Date & Time</label>
+                        <input type="datetime-local" name="end_time" value="{{ item.end_time|date:'Y-m-d\TH:i' }}" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-medium">
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow transition">
+                            Save Schedule Window
+                        </button>
+                    </div>
+                </form>
+            </div>
+        {% empty %}
+            <div class="p-8 text-center text-xs text-slate-400 font-semibold">No blocks available to schedule.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

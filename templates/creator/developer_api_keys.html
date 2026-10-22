@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}API Keys & Security — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">Developer API Keys</h1>
+            <p class="text-sm text-slate-500">Manage REST API credentials for custom mobile apps, PWAs, or integrations.</p>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="name" value="Production API Key">
+            <button type="submit" class="px-4 py-2 bg-purple-600 text-white font-bold text-xs rounded-xl hover:bg-purple-700">
+                + Create New API Key
+            </button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <div class="divide-y divide-slate-100">
+            {% for key in keys %}
+                <div class="py-4 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-sm">{{ key.name }}</h4>
+                        <p class="text-xs font-mono text-slate-500">Prefix: {{ key.key_prefix }}... (Full secret hidden after creation)</p>
+                    </div>
+                    <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">ACTIVE</span>
+                </div>
+            {% empty %}
+                <div class="py-6 text-center text-slate-400 text-xs">No API keys created yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

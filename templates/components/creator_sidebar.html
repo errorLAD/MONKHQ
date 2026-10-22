@@ -1,0 +1,312 @@
+<aside class="w-64 bg-white text-[#475467] flex-shrink-0 flex flex-col h-screen sticky top-0 border-r border-[#E4E7EC] shadow-card overflow-y-auto">
+    <!-- Header Logo -->
+    <div class="p-4 border-b border-[#E4E7EC] bg-[#FAFAFB]">
+        <a href="{% url 'creator_dashboard' %}" class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-lg bg-[#2451FF] flex items-center justify-center text-white font-bold text-xs shadow-card">
+                M
+            </div>
+            <div>
+                <h1 class="text-[0.8rem] font-bold text-[#101828] leading-none">MONKHQ</h1>
+                <p class="text-[0.6rem] font-semibold text-[#475467] tracking-tight mt-0.5">Creator Platform</p>
+            </div>
+        </a>
+    </div>
+
+    <!-- Navigation List -->
+    <nav class="flex-1 px-3 py-3 space-y-2 text-[0.72rem]">
+        
+        <!-- DASHBOARD (Direct Link) -->
+        <div>
+            <a href="{% url 'creator_dashboard' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if request.resolver_match.url_name == 'creator_dashboard' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 text-[#2451FF]"></i>
+                <span>DASHBOARD</span>
+            </a>
+        </div>
+
+        {% with curr=request.resolver_match.url_name %}
+
+        <!-- 1. CREATOR GROWTH STUDIO (Dropdown) -->
+        <div class="sidebar-dropdown">
+            <button type="button" class="dropdown-toggle w-full px-2.5 py-1 flex items-center justify-between text-[0.58rem] font-bold uppercase tracking-wider text-[#98A2B3] hover:text-[#101828] transition rounded-md select-none" data-target="dropdown-growth" aria-expanded="{% if curr == 'creator_dashboard' or 'growth_studio' in curr or 'creator_script' in curr or 'creator_viral' in curr or 'creator_voice' in curr or 'creator_content_ideas' in curr or 'creator_content_calendar' in curr or 'creator_calendar' in curr or 'creator_inspiration_library' in curr or 'creator_performance_coach' in curr %}true{% else %}false{% endif %}">
+                <div class="flex items-center gap-1.5">
+                    <span>CREATOR GROWTH STUDIO</span>
+                    <span class="px-1.5 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[8px] font-black rounded-full uppercase">NEW</span>
+                </div>
+                <i data-lucide="chevron-down" class="dropdown-chevron w-3 h-3 text-[#98A2B3] transition-transform duration-200 {% if curr == 'creator_dashboard' or 'growth_studio' in curr or 'creator_script' in curr or 'creator_viral' in curr or 'creator_voice' in curr or 'creator_content_ideas' in curr or 'creator_content_calendar' in curr or 'creator_calendar' in curr or 'creator_inspiration_library' in curr or 'creator_performance_coach' in curr %}rotate-180{% endif %}"></i>
+            </button>
+            <div id="dropdown-growth" class="dropdown-content space-y-0.5 mt-0.5 {% if not curr == 'creator_dashboard' and not 'growth_studio' in curr and not 'creator_script' in curr and not 'creator_viral' in curr and not 'creator_voice' in curr and not 'creator_content_ideas' in curr and not 'creator_content_calendar' in curr and not 'creator_calendar' in curr and not 'creator_inspiration_library' in curr and not 'creator_performance_coach' in curr %}hidden{% endif %}">
+                <a href="{% url 'creator_growth_studio_overview' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_growth_studio_overview' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="compass" class="w-3.5 h-3.5 text-purple-600"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="{% url 'creator_script_studio' %}" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg {% if 'creator_script' in curr %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="video" class="w-3.5 h-3.5 text-blue-600"></i>
+                        <span>AI Script Studio</span>
+                    </div>
+                    <span class="px-1.5 py-0.5 text-[8px] font-extrabold rounded-full bg-blue-50 text-blue-700">Reels</span>
+                </a>
+                <a href="{% url 'creator_viral_finder' %}" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg {% if 'creator_viral' in curr %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="flame" class="w-3.5 h-3.5 text-rose-500"></i>
+                        <span>Viral Finder</span>
+                    </div>
+                    <span class="px-1.5 py-0.5 text-[8px] font-extrabold rounded-full bg-rose-50 text-rose-600">Breakout</span>
+                </a>
+                <a href="{% url 'creator_voice_profile' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_voice_profile' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="mic" class="w-3.5 h-3.5 text-emerald-600"></i>
+                    <span>My Voice Profile</span>
+                </a>
+                <a href="{% url 'creator_content_ideas' %}" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg {% if 'creator_content_ideas' in curr %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="lightbulb" class="w-3.5 h-3.5 text-amber-500"></i>
+                        <span>Content Ideas</span>
+                    </div>
+                    <span class="px-1.5 py-0.5 text-[8px] font-extrabold rounded-full bg-amber-50 text-amber-700">Batch</span>
+                </a>
+                <a href="{% url 'creator_content_calendar' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if 'creator_content_calendar' in curr or 'creator_calendar' in curr %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-sky-600"></i>
+                    <span>Content Calendar</span>
+                </a>
+                <a href="{% url 'creator_inspiration_library' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if 'creator_inspiration_library' in curr %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="bookmark" class="w-3.5 h-3.5 text-indigo-600"></i>
+                    <span>Inspiration Library</span>
+                </a>
+                <a href="{% url 'creator_performance_coach' %}" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg {% if 'creator_performance_coach' in curr %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-purple-600"></i>
+                        <span>Performance Coach</span>
+                    </div>
+                    <span class="px-1.5 py-0.5 text-[8px] font-extrabold rounded-full bg-purple-50 text-purple-700">AI</span>
+                </a>
+            </div>
+        </div>
+
+
+        <!-- 2. AUTOMATIONS (Dropdown) -->
+        <div class="sidebar-dropdown">
+            <button type="button" class="dropdown-toggle w-full px-2.5 py-1 flex items-center justify-between text-[0.58rem] font-bold uppercase tracking-wider text-[#98A2B3] hover:text-[#101828] transition rounded-md select-none" data-target="dropdown-automations" aria-expanded="{% if 'creator_automations' in curr %}true{% else %}false{% endif %}">
+                <div class="flex items-center gap-1.5">
+                    <span>AUTOMATIONS</span>
+                    <span class="px-1.5 py-0.5 bg-blue-50 text-blue-700 text-[9px] font-black rounded-full">AI ENGINE</span>
+                </div>
+                <i data-lucide="chevron-down" class="dropdown-chevron w-3 h-3 text-[#98A2B3] transition-transform duration-200 {% if 'creator_automations' in curr %}rotate-180{% endif %}"></i>
+            </button>
+            <div id="dropdown-automations" class="dropdown-content space-y-0.5 mt-0.5 {% if not 'creator_automations' in curr %}hidden{% endif %}">
+                <a href="{% url 'creator_automations_list' %}" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg {% if curr == 'creator_automations_list' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="bot" class="w-3.5 h-3.5 text-[#2451FF]"></i> <span>All Automations</span>
+                    </div>
+                    <span class="px-1.5 py-0.5 text-[9px] font-extrabold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Active</span>
+                </a>
+                <a href="{% url 'creator_automations_canvas' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_automations_canvas' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="workflow" class="w-3.5 h-3.5 text-[#2451FF]"></i> <span>Visual Canvas Builder</span>
+                </a>
+                <a href="{% url 'creator_automations_ai_sales' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_automations_ai_sales' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#B54708]"></i> <span>AI Sales Automation</span>
+                </a>
+                <a href="{% url 'creator_automations_comment_to_dm' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_automations_comment_to_dm' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="message-square" class="w-3.5 h-3.5 text-[#067647]"></i> <span>Comment to DM</span>
+                </a>
+                <a href="{% url 'creator_automations_retrigger' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_automations_retrigger' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-[#175CD3]"></i> <span>Re-trigger Engine</span>
+                </a>
+                <a href="{% url 'creator_automations_logs' %}" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg {% if curr == 'creator_automations_logs' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="file-text" class="w-3.5 h-3.5 text-[#98A2B3]"></i> <span>Automation Logs</span>
+                    </div>
+                    <span class="px-1.5 py-0.5 text-[9px] font-extrabold rounded-full bg-slate-100 text-slate-600">Logs</span>
+                </a>
+                <a href="{% url 'creator_automations_templates' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_automations_templates' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="layers" class="w-3.5 h-3.5 text-[#B42318]"></i> <span>Templates Gallery</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 3. ENGAGEMENT (Dropdown) -->
+        <div class="sidebar-dropdown">
+            <button type="button" class="dropdown-toggle w-full px-2.5 py-1 flex items-center justify-between text-[0.58rem] font-bold uppercase tracking-wider text-[#98A2B3] hover:text-[#101828] transition rounded-md select-none" data-target="dropdown-engagement" aria-expanded="{% if 'creator_engagement' in curr %}true{% else %}false{% endif %}">
+                <span>ENGAGEMENT</span>
+                <i data-lucide="chevron-down" class="dropdown-chevron w-3 h-3 text-[#98A2B3] transition-transform duration-200 {% if 'creator_engagement' in curr %}rotate-180{% endif %}"></i>
+            </button>
+            <div id="dropdown-engagement" class="dropdown-content space-y-0.5 mt-0.5 {% if not 'creator_engagement' in curr %}hidden{% endif %}">
+                <a href="{% url 'creator_engagement_inbox' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_engagement_inbox' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="inbox" class="w-3.5 h-3.5 text-[#067647]"></i> <span>Inbox & Handoff</span>
+                </a>
+                <a href="{% url 'creator_engagement_contacts' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_engagement_contacts' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="users" class="w-3.5 h-3.5 text-[#98A2B3]"></i> <span>Contacts</span>
+                </a>
+                <a href="{% url 'creator_engagement_lead_scoring' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_engagement_lead_scoring' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="target" class="w-3.5 h-3.5 text-[#B54708]"></i> <span>Lead Scoring & Segments</span>
+                </a>
+                <a href="{% url 'creator_engagement_brand_deals' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_engagement_brand_deals' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="briefcase" class="w-3.5 h-3.5 text-[#2451FF]"></i> <span>Brand Deals</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 4. AI ENGINE (Dropdown) -->
+        <div class="sidebar-dropdown">
+            <button type="button" class="dropdown-toggle w-full px-2.5 py-1 flex items-center justify-between text-[0.58rem] font-bold uppercase tracking-wider text-[#98A2B3] hover:text-[#101828] transition rounded-md select-none" data-target="dropdown-ai" aria-expanded="{% if 'creator_ai' in curr %}true{% else %}false{% endif %}">
+                <span>AI ENGINE</span>
+                <i data-lucide="chevron-down" class="dropdown-chevron w-3 h-3 text-[#98A2B3] transition-transform duration-200 {% if 'creator_ai' in curr %}rotate-180{% endif %}"></i>
+            </button>
+            <div id="dropdown-ai" class="dropdown-content space-y-0.5 mt-0.5 {% if not 'creator_ai' in curr %}hidden{% endif %}">
+                <a href="{% url 'creator_ai_agent' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_ai_agent' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="brain-circuit" class="w-3.5 h-3.5 text-[#2451FF]"></i> <span>AI Sales Agent</span>
+                </a>
+                <a href="{% url 'creator_ai_knowledge_base' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_ai_knowledge_base' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5 text-[#98A2B3]"></i> <span>Knowledge Base</span>
+                </a>
+                <a href="{% url 'creator_ai_insights' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_ai_insights' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="trending-up" class="w-3.5 h-3.5 text-[#067647]"></i> <span>AI Business Insights</span>
+                </a>
+                <a href="{% url 'creator_ai_rotation' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_ai_rotation' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="repeat" class="w-3.5 h-3.5 text-[#98A2B3]"></i> <span>Message Rotation</span>
+                </a>
+                <a href="{% url 'creator_ai_guard' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_ai_guard' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#B42318]"></i> <span>Comment Guard</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 5. PROMOTIONS (Dropdown) -->
+        <div class="sidebar-dropdown">
+            <button type="button" class="dropdown-toggle w-full px-2.5 py-1 flex items-center justify-between text-[0.58rem] font-bold uppercase tracking-wider text-[#98A2B3] hover:text-[#101828] transition rounded-md select-none" data-target="dropdown-promotions" aria-expanded="{% if 'creator_promotions' in curr %}true{% else %}false{% endif %}">
+                <span>PROMOTIONS</span>
+                <i data-lucide="chevron-down" class="dropdown-chevron w-3 h-3 text-[#98A2B3] transition-transform duration-200 {% if 'creator_promotions' in curr %}rotate-180{% endif %}"></i>
+            </button>
+            <div id="dropdown-promotions" class="dropdown-content space-y-0.5 mt-0.5 {% if not 'creator_promotions' in curr %}hidden{% endif %}">
+                <a href="{% url 'creator_promotions_my' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_promotions_my' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="folder" class="w-3.5 h-3.5 text-[#98A2B3]"></i> <span>My Promotions</span>
+                </a>
+                <a href="{% url 'creator_promotions_interested' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_promotions_interested' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="heart" class="w-3.5 h-3.5 text-[#B42318]"></i> <span>Interested Promotions</span>
+                </a>
+                <a href="{% url 'creator_promotions_find' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_promotions_find' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="search" class="w-3.5 h-3.5 text-[#175CD3]"></i> <span>Find Promotions</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 6. LINK HUB (Dropdown) -->
+        <div class="sidebar-dropdown">
+            <button type="button" class="dropdown-toggle w-full px-2.5 py-1 flex items-center justify-between text-[0.58rem] font-bold uppercase tracking-wider text-[#98A2B3] hover:text-[#101828] transition rounded-md select-none" data-target="dropdown-linkhub" aria-expanded="{% if 'creator_linkhub' in curr %}true{% else %}false{% endif %}">
+                <span>LINK HUB</span>
+                <i data-lucide="chevron-down" class="dropdown-chevron w-3 h-3 text-[#98A2B3] transition-transform duration-200 {% if 'creator_linkhub' in curr %}rotate-180{% endif %}"></i>
+            </button>
+            <div id="dropdown-linkhub" class="dropdown-content space-y-0.5 mt-0.5 {% if not 'creator_linkhub' in curr %}hidden{% endif %}">
+                <a href="{% url 'creator_linkhub_main' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_main' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="link-2" class="w-3.5 h-3.5 text-[#2451FF]"></i> <span>My Link Hub</span>
+                </a>
+                <a href="{% url 'creator_linkhub_storefront' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_storefront' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="store" class="w-3.5 h-3.5 text-[#067647]"></i> <span>Storefront & Profile Link</span>
+                </a>
+                <a href="{% url 'creator_linkhub_links' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_links' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="link" class="w-3.5 h-3.5 text-[#98A2B3]"></i> <span>Links</span>
+                </a>
+                <a href="{% url 'creator_linkhub_shortener' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_shortener' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="zap" class="w-3.5 h-3.5 text-[#2451FF]"></i> <span>Short Links (/go/)</span>
+                </a>
+                <a href="{% url 'creator_linkhub_products' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_products' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="shopping-bag" class="w-3.5 h-3.5 text-[#067647]"></i> <span>Products</span>
+                </a>
+                <a href="{% url 'creator_linkhub_digital' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_digital' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="file-down" class="w-3.5 h-3.5 text-[#B54708]"></i> <span>Digital Products</span>
+                </a>
+                <a href="{% url 'creator_linkhub_affiliate' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if request.resolver_match.url_name == 'creator_linkhub_affiliate' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-[#98A2B3]"></i> <span>Affiliate Links</span>
+                </a>
+                <a href="{% url 'creator_linkhub_appearance' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_appearance' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="palette" class="w-3.5 h-3.5 text-[#B42318]"></i> <span>Appearance</span>
+                </a>
+                <a href="{% url 'creator_linkhub_analytics' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_analytics' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-[#98A2B3]"></i> <span>Analytics</span>
+                </a>
+                <a href="{% url 'creator_linkhub_qrcode' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_qrcode' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="qr-code" class="w-3.5 h-3.5 text-[#2451FF]"></i> <span>QR Code</span>
+                </a>
+                <a href="{% url 'creator_linkhub_audience' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_audience' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="users" class="w-3.5 h-3.5 text-[#067647]"></i> <span>Audience</span>
+                </a>
+                <a href="{% url 'creator_linkhub_forms' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_forms' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="file-input" class="w-3.5 h-3.5 text-[#B54708]"></i> <span>Forms</span>
+                </a>
+                <a href="{% url 'creator_linkhub_scheduled' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_linkhub_scheduled' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#175CD3]"></i> <span>Scheduled Links</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 7. SALES (Dropdown) -->
+        <div class="sidebar-dropdown">
+            <button type="button" class="dropdown-toggle w-full px-2.5 py-1 flex items-center justify-between text-[0.58rem] font-bold uppercase tracking-wider text-[#98A2B3] hover:text-[#101828] transition rounded-md select-none" data-target="dropdown-sales" aria-expanded="{% if 'creator_sales' in curr %}true{% else %}false{% endif %}">
+                <span>SALES</span>
+                <i data-lucide="chevron-down" class="dropdown-chevron w-3 h-3 text-[#98A2B3] transition-transform duration-200 {% if 'creator_sales' in curr %}rotate-180{% endif %}"></i>
+            </button>
+            <div id="dropdown-sales" class="dropdown-content space-y-0.5 mt-0.5 {% if not 'creator_sales' in curr %}hidden{% endif %}">
+                <a href="{% url 'creator_sales_products' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_sales_products' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="tag" class="w-3.5 h-3.5 text-[#98A2B3]"></i> <span>Products & Offers</span>
+                </a>
+                <a href="{% url 'creator_sales_orders' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_sales_orders' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="shopping-cart" class="w-3.5 h-3.5 text-[#067647]"></i> <span>Orders & Tracking</span>
+                </a>
+                <a href="{% url 'creator_sales_revenue' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_sales_revenue' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-[#B54708]"></i> <span>Revenue Attribution</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 8. UTILITY / ACCOUNT LINKS (Dropdown) -->
+        <div class="sidebar-dropdown pt-2 border-t border-[#E4E7EC]">
+            <button type="button" class="dropdown-toggle w-full px-2.5 py-1 flex items-center justify-between text-[0.58rem] font-bold uppercase tracking-wider text-[#98A2B3] hover:text-[#101828] transition rounded-md select-none" data-target="dropdown-settings" aria-expanded="{% if curr == 'creator_analytics' or curr == 'creator_social_accounts' or curr == 'creator_account_health' or curr == 'creator_settings' or curr == 'creator_billing' %}true{% else %}false{% endif %}">
+                <span>ACCOUNT & SETTINGS</span>
+                <i data-lucide="chevron-down" class="dropdown-chevron w-3 h-3 text-[#98A2B3] transition-transform duration-200 {% if curr == 'creator_analytics' or curr == 'creator_social_accounts' or curr == 'creator_account_health' or curr == 'creator_settings' or curr == 'creator_billing' %}rotate-180{% endif %}"></i>
+            </button>
+            <div id="dropdown-settings" class="dropdown-content space-y-0.5 mt-0.5 {% if curr != 'creator_analytics' and curr != 'creator_social_accounts' and curr != 'creator_account_health' and curr != 'creator_settings' and curr != 'creator_billing' %}hidden{% endif %}">
+                <a href="{% url 'creator_analytics' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_analytics' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="line-chart" class="w-3.5 h-3.5 text-[#2451FF]"></i> <span>ANALYTICS</span>
+                </a>
+                <a href="{% url 'creator_social_accounts' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_social_accounts' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="instagram" class="w-3.5 h-3.5 text-[#B42318]"></i> <span>SOCIAL ACCOUNTS</span>
+                </a>
+                <a href="{% url 'creator_account_health' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_account_health' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="activity" class="w-3.5 h-3.5 text-[#067647]"></i> <span>ACCOUNT HEALTH</span>
+                </a>
+                <a href="{% url 'creator_settings' %}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg {% if curr == 'creator_settings' %}text-[#2451FF] bg-[#EEF2FF] font-semibold border border-[#D6E0FF]{% else %}hover:bg-[#FAFAFB] hover:text-[#101828] transition font-medium{% endif %}">
+                    <i data-lucide="settings" class="w-3.5 h-3.5 text-[#98A2B3]"></i> <span>SETTINGS</span>
+                </a>
+            </div>
+        </div>
+
+        {% endwith %}
+
+    </nav>
+</aside>
+
+<!-- Dropdown Toggle Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const toggles = document.querySelectorAll('.dropdown-toggle');
+        toggles.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-target');
+                const menu = document.getElementById(targetId);
+                const chevron = this.querySelector('.dropdown-chevron');
+                if (!menu) return;
+
+                const isOpen = !menu.classList.contains('hidden');
+                if (isOpen) {
+                    menu.classList.add('hidden');
+                    this.setAttribute('aria-expanded', 'false');
+                    if (chevron) chevron.classList.remove('rotate-180');
+                } else {
+                    menu.classList.remove('hidden');
+                    this.setAttribute('aria-expanded', 'true');
+                    if (chevron) chevron.classList.add('rotate-180');
+                }
+            });
+        });
+    });
+</script>

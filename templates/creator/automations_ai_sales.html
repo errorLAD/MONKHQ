@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Sales Automation — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">AI Sales Automation</h1>
+            <p class="text-xs text-slate-500">Turn social conversations into customers with real-time AI product matching.</p>
+        </div>
+        <span class="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold rounded-full flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Mode: {{ agent.get_mode_display }}
+        </span>
+    </div>
+
+    <!-- Live AI Performance Metrics (PostgreSQL DB) -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400">Conversations</span>
+            <h3 class="text-lg font-black text-slate-900">{{ agent.conversations_count }}</h3>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400">AI Responses</span>
+            <h3 class="text-lg font-black text-blue-600">{{ agent.ai_responses_count }}</h3>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400">Human Handoffs</span>
+            <h3 class="text-lg font-black text-amber-600">{{ agent.human_handoffs_count }}</h3>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400">Leads Captured</span>
+            <h3 class="text-lg font-black text-purple-600">{{ agent.leads_count }}</h3>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400">Conversions</span>
+            <h3 class="text-lg font-black text-emerald-600">{{ agent.conversions_count }}</h3>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400">AI Revenue</span>
+            <h3 class="text-lg font-black text-slate-900">${{ agent.revenue|floatformat:2 }}</h3>
+        </div>
+    </div>
+
+    <!-- AI Sales Flow Diagram -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 text-white p-6 rounded-2xl shadow-xl space-y-3">
+        <h3 class="text-xs font-black uppercase tracking-wider text-blue-300">Live AI Sales Flow Architecture</h3>
+        <div class="flex items-center justify-between text-xs font-extrabold gap-2 overflow-x-auto py-2">
+            <div class="p-3 bg-white/10 rounded-xl border border-white/10 text-center flex-1 min-w-[120px]">
+                <div class="text-[10px] text-blue-200">Customer</div>
+                <div class="text-white mt-1">Message</div>
+            </div>
+            <span class="text-blue-400">➔</span>
+            <div class="p-3 bg-white/10 rounded-xl border border-white/10 text-center flex-1 min-w-[120px]">
+                <div class="text-[10px] text-purple-200">AI Engine</div>
+                <div class="text-white mt-1">Intent Detection</div>
+            </div>
+            <span class="text-blue-400">➔</span>
+            <div class="p-3 bg-white/10 rounded-xl border border-white/10 text-center flex-1 min-w-[120px]">
+                <div class="text-[10px] text-emerald-200">DB Lookup</div>
+                <div class="text-white mt-1">Product Match</div>
+            </div>
+            <span class="text-blue-400">➔</span>
+            <div class="p-3 bg-white/10 rounded-xl border border-white/10 text-center flex-1 min-w-[120px]">
+                <div class="text-[10px] text-amber-200">Checkout</div>
+                <div class="text-white mt-1">Purchase</div>
+            </div>
+            <span class="text-blue-400">➔</span>
+            <div class="p-3 bg-white/10 rounded-xl border border-white/10 text-center flex-1 min-w-[120px]">
+                <div class="text-[10px] text-emerald-200">Attribution</div>
+                <div class="text-white mt-1">Revenue</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent Configuration Form -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h3 class="text-xs font-black uppercase text-slate-700 border-b pb-2">AI Agent Settings</h3>
+        
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Agent Name</label>
+                    <input type="text" name="agent_name" value="{{ agent.agent_name }}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Tone of Voice</label>
+                    <input type="text" name="tone" value="{{ agent.tone }}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Execution Mode</label>
+                    <select name="mode" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                        <option value="AUTOMATIC" {% if agent.mode == 'AUTOMATIC' %}selected{% endif %}>Fully Automatic AI</option>
+                        <option value="ASSISTED" {% if agent.mode == 'ASSISTED' %}selected{% endif %}>Assisted (Human Approval)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Instructions & Sales Goals</label>
+                <textarea name="instructions" rows="2" class="w-full p-3 border border-slate-300 rounded-xl text-xs font-semibold">{{ agent.instructions }}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Knowledge Base & FAQs</label>
+                <textarea name="knowledge_base" rows="3" class="w-full p-3 border border-slate-300 rounded-xl text-xs font-semibold">{{ agent.knowledge_base }}</textarea>
+            </div>
+
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow transition">
+                Save AI Agent Settings
+            </button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

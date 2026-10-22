@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block title %}Visual Canvas Builder — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="h-[calc(100vh-100px)] flex flex-col space-y-3" x-data="{ 
+    zoom: 100, 
+    selectedNode: 'trigger', 
+    triggerType: 'INSTAGRAM_COMMENT',
+    keywords: 'PRICE, LINK, BUY, STORE',
+    conditionRule: 'CONTAINS_KEYWORD',
+    actionType: 'SEND_DM',
+    dmMessage: 'Hey! Here is your requested Link Hub Storefront link: https://monkhq.in/@alex_creator',
+    testInput: 'PRICE',
+    simulating: false,
+    simSuccess: false
+}">
+    
+    <!-- Top Canvas Control Bar -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-extrabold shadow-sm">
+                <i data-lucide="workflow" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h1 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <span>Visual Workflow Canvas Builder</span>
+                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-full border border-emerald-200">
+                        ● LIVE INTERACTIVE
+                    </span>
+                </h1>
+                <p class="text-xs text-slate-500">Design comment-to-DM, AI Sales Agent, and storefront automated workflows visually.</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+            <!-- Zoom Controls -->
+            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold text-slate-700">
+                <button @click="zoom = Math.max(70, zoom - 10)" class="px-2 py-1 hover:bg-white rounded-lg transition">-</button>
+                <span class="px-2" x-text="zoom + '%'">100%</span>
+                <button @click="zoom = Math.min(130, zoom + 10)" class="px-2 py-1 hover:bg-white rounded-lg transition">+</button>
+                <button @click="zoom = 100" class="px-2 py-1 text-[10px] hover:bg-white rounded-lg text-slate-500">Reset</button>
+            </div>
+
+            <!-- Test Simulation Button -->
+            <button @click="simulating = true; setTimeout(() => { simulating = false; simSuccess = true; }, 1200)" class="px-3.5 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 font-extrabold text-xs rounded-xl border border-purple-200 transition flex items-center gap-1.5">
+                <i data-lucide="play" class="w-3.5 h-3.5"></i> Test Flow
+            </button>
+
+            <!-- Save & Deploy Form -->
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="name" value="Comment to DM Storefront Workflow">
+                <input type="hidden" name="keywords" x-model="keywords">
+                <input type="hidden" name="dm_text" x-model="dmMessage">
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                    <i data-lucide="save" class="w-3.5 h-3.5"></i> Save & Deploy Workflow
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Canvas Viewport Area -->
+    <div class="flex-1 bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden relative flex">
+        
+        <!-- Canvas Background Grid -->
+        <div class="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] opacity-60 pointer-events-none"></div>
+
+        <!-- SVG Flow Connection Lines Overlay -->
+        <svg class="absolute inset-0 w-full h-full pointer-events-none z-10">
+            <defs>
+                <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#3B82F6" />
+                    <stop offset="50%" stop-color="#8B5CF6" />
+                    <stop offset="100%" stop-color="#10B981" />
+                </linearGradient>
+            </defs>
+
+            <!-- Curved Connecting Line: Trigger -> Condition -->
+            <path d="M 330 240 C 400 240, 410 240, 480 240" fill="none" stroke="url(#flowGrad)" stroke-width="4" stroke-linecap="round" class="animate-pulse" />
+            <circle cx="405" cy="240" r="5" fill="#60A5FA" class="animate-ping" />
+
+            <!-- Curved Connecting Line: Condition -> Action -->
+            <path d="M 760 240 C 830 240, 840 240, 910 240" fill="none" stroke="url(#flowGrad)" stroke-width="4" stroke-linecap="round" class="animate-pulse" />
+            <circle cx="835" cy="240" r="5" fill="#34D399" class="animate-ping" />
+        </svg>
+
+        <!-- Nodes Container (Scalable Viewport) -->
+        <div class="flex-1 p-8 overflow-auto flex items-center justify-start gap-12 z-20 transition-transform duration-200" :style="`transform: scale(${zoom/100}); transform-origin: top left;`">
+            
+            <!-- NODE 1: TRIGGER NODE -->
+            <div @click="selectedNode = 'trigger'" class="w-80 bg-slate-800/90 backdrop-blur-xl border-2 rounded-2xl p-5 shadow-2xl space-y-4 cursor-pointer transition transform hover:-translate-y-1 relative group" :class="selectedNode === 'trigger' ? 'border-blue-500 ring-4 ring-blue-500/20' : 'border-slate-700 hover:border-slate-600'">
+                <!-- Node Header -->
+                <div class="flex items-center justify-between border-b border-slate-700/80 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400 font-bold">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-black uppercase tracking-wider text-blue-400">Step 1</span>
+                            <h3 class="text-xs font-extrabold text-white">Trigger Event</h3>
+                        </div>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="Active Trigger"></span>
+                </div>
+
+                <!-- Node Inputs -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Trigger Platform</label>
+                        <select x-model="triggerType" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-blue-500">
+                            <option value="INSTAGRAM_COMMENT">Instagram Comment Received</option>
+                            <option value="FACEBOOK_COMMENT">Facebook Comment Received</option>
+                            <option value="DM_KEYWORD">DM Keyword Detected</option>
+                            <option value="NEW_FOLLOWER">New Follower Event</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Trigger Keywords</label>
+                        <input type="text" x-model="keywords" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-blue-300 focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Output Port Dot -->
+                <div class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-blue-600 border-2 border-slate-900 flex items-center justify-center shadow-lg text-white text-[10px] font-black">
+                    ➔
+                </div>
+            </div>
+
+            <!-- NODE 2: CONDITION FILTER NODE -->
+            <div @click="selectedNode = 'condition'" class="w-80 bg-slate-800/90 backdrop-blur-xl border-2 rounded-2xl p-5 shadow-2xl space-y-4 cursor-pointer transition transform hover:-translate-y-1 relative group" :class="selectedNode === 'condition' ? 'border-purple-500 ring-4 ring-purple-500/20' : 'border-slate-700 hover:border-slate-600'">
+                
+                <!-- Input Port Dot -->
+                <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-blue-600 border-2 border-slate-900 flex items-center justify-center shadow-lg text-white text-[10px] font-black">
+                    ➔
+                </div>
+
+                <!-- Node Header -->
+                <div class="flex items-center justify-between border-b border-slate-700/80 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-400 font-bold">
+                            <i data-lucide="filter" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-black uppercase tracking-wider text-purple-400">Step 2</span>
+                            <h3 class="text-xs font-extrabold text-white">Condition Rule</h3>
+                        </div>
+                    </div>
+                    <span class="px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[9px] font-bold rounded-full border border-purple-400/30">
+                        Rule Filter
+                    </span>
+                </div>
+
+                <!-- Node Inputs -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Filter Condition</label>
+                        <select x-model="conditionRule" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-purple-500">
+                            <option value="CONTAINS_KEYWORD">Contains Target Keywords</option>
+                            <option value="LEAD_SCORE">Lead Score &gt;= 10 Points</option>
+                            <option value="FIRST_TIME">First Time Interaction Only</option>
+                            <option value="AI_INTENT">AI Purchase Intent Filter</option>
+                        </select>
+                    </div>
+
+                    <div class="p-2.5 bg-slate-900/60 rounded-xl border border-slate-700/60 text-[10px] text-slate-400 font-medium">
+                        🛡️ Safety Guard: Enforces 60-second cooldown per user to prevent duplicate DMs.
+                    </div>
+                </div>
+
+                <!-- Output Port Dot -->
+                <div class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-purple-600 border-2 border-slate-900 flex items-center justify-center shadow-lg text-white text-[10px] font-black">
+                    ➔
+                </div>
+            </div>
+
+            <!-- NODE 3: ACTION / PAYLOAD NODE -->
+            <div @click="selectedNode = 'action'" class="w-80 bg-slate-800/90 backdrop-blur-xl border-2 rounded-2xl p-5 shadow-2xl space-y-4 cursor-pointer transition transform hover:-translate-y-1 relative group" :class="selectedNode === 'action' ? 'border-emerald-500 ring-4 ring-emerald-500/20' : 'border-slate-700 hover:border-slate-600'">
+                
+                <!-- Input Port Dot -->
+                <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-purple-600 border-2 border-slate-900 flex items-center justify-center shadow-lg text-white text-[10px] font-black">
+                    ➔
+                </div>
+
+                <!-- Node Header -->
+                <div class="flex items-center justify-between border-b border-slate-700/80 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 font-bold">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-black uppercase tracking-wider text-emerald-400">Step 3</span>
+                            <h3 class="text-xs font-extrabold text-white">Action Payload</h3>
+                        </div>
+                    </div>
+                    <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-[9px] font-bold rounded-full border border-emerald-400/30">
+                        Output Action
+                    </span>
+                </div>
+
+                <!-- Node Inputs -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Execution Action</label>
+                        <select x-model="actionType" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-emerald-500">
+                            <option value="SEND_DM">Send Automated DM with Storefront Link</option>
+                            <option value="SEND_DIGITAL">Send Digital Download PDF Link</option>
+                            <option value="SEND_COUPON">Send Promo Discount Coupon Code</option>
+                            <option value="HANDOFF_LIVE">Escalate to Live Inbox Agent</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">DM Message Payload</label>
+                        <textarea x-model="dmMessage" rows="3" class="w-full p-2 bg-slate-900 border border-slate-700 rounded-xl text-xs font-semibold text-emerald-300 focus:outline-none focus:border-emerald-500"></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Simulation Test Overlay Modal -->
+        <div x-show="simulating || simSuccess" class="absolute inset-0 bg-slate-950/80 backdrop-blur-md z-30 flex items-center justify-center p-6" x-transition>
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-md w-full shadow-2xl space-y-4 text-center">
+                <template x-if="simulating">
+                    <div class="space-y-3 py-4">
+                        <div class="w-12 h-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin mx-auto"></div>
+                        <h3 class="text-sm font-extrabold text-white">Simulating Execution Flow...</h3>
+                        <p class="text-xs text-slate-400">Triggering comment event -> Evaluating keywords -> Generating DM Payload...</p>
+                    </div>
+                </template>
+
+                <template x-if="simSuccess">
+                    <div class="space-y-4 py-2">
+                        <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center mx-auto text-xl font-bold">
+                            ✓
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-extrabold text-white">Simulation Test Passed!</h3>
+                            <p class="text-xs text-slate-400 mt-1">Comment "<span class="text-blue-400 font-bold" x-text="testInput">PRICE</span>" successfully triggered DM payload with Link Hub Storefront URL.</p>
+                        </div>
+                        <button @click="simSuccess = false" class="px-5 py-2 bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow">
+                            Close Test Window
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

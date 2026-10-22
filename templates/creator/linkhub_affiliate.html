@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Affiliate Links Store — Link Hub{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">Affiliate Storefront</h1>
+            <p class="text-xs text-slate-500">List recommended products with Amazon, Flipkart, or custom affiliate links.</p>
+        </div>
+        <a href="{% url 'creator_linkhub_main' %}" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200 transition">
+            ← Back to Editor
+        </a>
+    </div>
+
+    <!-- Create Affiliate Product -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h3 class="text-xs font-black uppercase tracking-wider text-rose-700">Add Affiliate Product</h3>
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Product Title</label>
+                <input type="text" name="title" placeholder="e.g. 📷 Sony A7 IV Camera" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Affiliate URL</label>
+                <input type="url" name="url" placeholder="https://amzn.to/..." required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Marketplace</label>
+                <select name="marketplace" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                    <option value="Amazon">Amazon</option>
+                    <option value="Flipkart">Flipkart</option>
+                    <option value="Custom">Custom Network</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Display Price ($)</label>
+                <input type="number" step="0.01" name="price" placeholder="2499.00" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div class="md:col-span-4">
+                <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow transition">
+                    + Add Affiliate Product
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Items List -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden divide-y divide-slate-100">
+        {% for item in items %}
+            <div class="p-4 flex items-center justify-between hover:bg-slate-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
+                        <i data-lucide="external-link" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-extrabold text-slate-900">{{ item.title }}</h4>
+                        <p class="text-[11px] text-slate-500 font-semibold">{{ item.affiliate_marketplace }} • ${% if item.price %}{{ item.price }}{% else %}N/A{% endif %}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">{{ item.click_count }} Clicks</span>
+                    <a href="{% url 'creator_linkhub_item_delete_api' item_id=item.id %}" class="text-rose-500 hover:text-rose-700 text-xs font-bold">Delete</a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="p-8 text-center text-xs text-slate-400 font-semibold">No affiliate products listed.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

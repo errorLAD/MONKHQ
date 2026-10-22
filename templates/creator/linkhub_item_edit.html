@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Block — {{ item.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">Edit Block</h1>
+            <p class="text-xs text-slate-500">Update block details, image, price, and CTA text.</p>
+        </div>
+        <a href="{% url 'creator_linkhub_main' %}" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200 transition">
+            ← Back to Editor
+        </a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Title</label>
+                <input type="text" name="title" value="{{ item.title }}" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">CTA Button Text</label>
+                <input type="text" name="cta_text" value="{{ item.cta_text }}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Target URL</label>
+                <input type="url" name="url" value="{{ item.url }}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Price ($)</label>
+                <input type="number" step="0.01" name="price" value="{{ item.price|default:'' }}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Description / Subtitle</label>
+            <textarea name="description" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">{{ item.description }}</textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Layout Style</label>
+                <select name="layout_size" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                    <option value="STANDARD" {% if item.layout_size == 'STANDARD' %}selected{% endif %}>Standard Card</option>
+                    <option value="FEATURED" {% if item.layout_size == 'FEATURED' %}selected{% endif %}>Featured Large Card</option>
+                    <option value="COMPACT" {% if item.layout_size == 'COMPACT' %}selected{% endif %}>Compact Row</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Block Thumbnail Image</label>
+                <input type="file" name="image" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-medium">
+            </div>
+        </div>
+
+        <div class="pt-4 flex items-center justify-between border-t border-slate-100">
+            <a href="{% url 'creator_linkhub_item_delete_api' item_id=item.id %}" onclick="return confirm('Delete this block permanently?')" class="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-xs rounded-xl transition">
+                Delete Block
+            </a>
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow transition">
+                Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

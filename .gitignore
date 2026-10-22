@@ -1,0 +1,32 @@
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Python & Django
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# Vercel & Deployment
+.vercel/
+build_output/
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+tempmediaStorage/

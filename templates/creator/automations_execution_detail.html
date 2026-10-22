@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Execution Details — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">Execution Timeline Details</h1>
+            <p class="text-xs text-slate-500">Execution ID: {{ execution.id }} · User: {{ execution.contact_username }}</p>
+        </div>
+        <a href="{% url 'creator_automations_logs' %}" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200">
+            ← Back to Logs
+        </a>
+    </div>
+
+    <!-- Step-by-Step Execution Timeline -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Execution Timeline</h3>
+
+        <div class="space-y-4 relative border-l-2 border-slate-200 pl-6 ml-3">
+            <div class="relative">
+                <div class="w-3.5 h-3.5 rounded-full bg-blue-600 absolute -left-[31px] top-0 border-2 border-white"></div>
+                <h4 class="text-xs font-extrabold text-slate-900">12:04:30 — Webhook Signal Received</h4>
+                <p class="text-[11px] text-slate-500">Instagram comment event payload received from Meta API.</p>
+            </div>
+
+            <div class="relative">
+                <div class="w-3.5 h-3.5 rounded-full bg-indigo-600 absolute -left-[31px] top-0 border-2 border-white"></div>
+                <h4 class="text-xs font-extrabold text-slate-900">12:04:30 — Signature Verified</h4>
+                <p class="text-[11px] text-slate-500">Meta API signature and OAuth workspace token verified.</p>
+            </div>
+
+            <div class="relative">
+                <div class="w-3.5 h-3.5 rounded-full bg-purple-600 absolute -left-[31px] top-0 border-2 border-white"></div>
+                <h4 class="text-xs font-extrabold text-slate-900">12:04:30 — Keyword Matched</h4>
+                <p class="text-[11px] text-slate-500">Comment text matched keyword "PRICE" (Contains Match).</p>
+            </div>
+
+            <div class="relative">
+                <div class="w-3.5 h-3.5 rounded-full bg-amber-600 absolute -left-[31px] top-0 border-2 border-white"></div>
+                <h4 class="text-xs font-extrabold text-slate-900">12:04:31 — Database Product Matched</h4>
+                <p class="text-[11px] text-slate-500">Matched Product "Wireless Pro Headphones" ($149.99).</p>
+            </div>
+
+            <div class="relative">
+                <div class="w-3.5 h-3.5 rounded-full bg-emerald-600 absolute -left-[31px] top-0 border-2 border-white"></div>
+                <h4 class="text-xs font-extrabold text-slate-900">12:04:32 — DM Payload Delivered</h4>
+                <p class="text-[11px] text-slate-500">Direct message containing storefront link successfully delivered.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

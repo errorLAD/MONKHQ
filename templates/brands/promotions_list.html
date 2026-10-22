@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Brand Promotions List — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">My Brand Promotions</h1>
+            <p class="text-sm text-slate-500">Manage campaign listings, budgets, and status.</p>
+        </div>
+        <a href="{% url 'brand_promotions_create' %}" class="px-4 py-2 bg-indigo-600 text-white font-bold text-xs rounded-xl hover:bg-indigo-700">+ Create Promotion</a>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <div class="divide-y divide-slate-100">
+            {% for promo in promotions %}
+                <div class="py-4 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-sm">{{ promo.title }}</h4>
+                        <p class="text-xs text-slate-500">Category: {{ promo.category }} | Min Followers: {{ promo.min_followers }}+</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-black text-emerald-600">${{ promo.budget }}</span>
+                        <p class="text-[10px] font-bold text-indigo-600 uppercase">{{ promo.status }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="py-6 text-center text-slate-400 text-xs">No promotions created yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

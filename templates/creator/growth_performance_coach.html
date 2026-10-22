@@ -1,0 +1,378 @@
+{% extends 'base.html' %}
+
+{% block title %}Performance Coach — Creator Growth Studio — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="performanceCoachStudio()">
+
+    <!-- Top Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-200">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-xs">
+                    META-VERIFIED INTELLIGENCE
+                </span>
+                <span class="text-xs font-semibold text-slate-400">Creator Growth Studio</span>
+            </div>
+            <h1 class="text-2xl font-black text-slate-950 tracking-tight mt-1">Performance Coach</h1>
+            <p class="text-xs text-slate-500 font-medium mt-0.5">
+                Audit genuine account engagement metrics via official Meta Graph API and request on-demand Gemini strategic analysis.
+            </p>
+        </div>
+        
+        <div class="flex items-center gap-2.5">
+            <a href="{% url 'creator_social_accounts' %}" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 shadow-xs flex items-center gap-1.5 transition">
+                <i data-lucide="instagram" class="w-3.5 h-3.5 text-pink-600"></i>
+                <span>Connected Accounts</span>
+            </a>
+            
+            {% if perf_data.connected %}
+            <button @click="triggerAIAnalysis()" :disabled="isAnalyzing" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-xs rounded-xl shadow flex items-center gap-2 transition disabled:opacity-50">
+                <template x-if="isAnalyzing">
+                    <span class="flex items-center gap-2">
+                        <svg class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                        </svg>
+                        <span>Analyzing with Gemini...</span>
+                    </span>
+                </template>
+                <template x-if="!isAnalyzing">
+                    <span class="flex items-center gap-1.5">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
+                        <span>Get AI Coach Recommendation</span>
+                    </span>
+                </template>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Account Status Alert / Disconnected State -->
+    {% if not perf_data.connected %}
+    <div class="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl p-6 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6 border border-white/10">
+        <div class="space-y-2 max-w-xl">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-black uppercase tracking-wider">
+                <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                Instagram Account Not Connected
+            </div>
+            <h3 class="text-lg font-black text-white">Unlock Real Performance Coaching with Meta Graph API</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                {{ perf_data.instructions|default:"Connect your Instagram Creator or Business account in Social Accounts to pull genuine metrics, top-performing reels, and customized AI growth recommendations." }}
+            </p>
+        </div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <a href="{% url 'creator_social_accounts' %}" class="px-5 py-2.5 bg-gradient-to-r from-[#2451FF] to-[#6b46f0] hover:opacity-95 text-white font-extrabold text-xs rounded-xl shadow flex items-center gap-2">
+                <i data-lucide="link" class="w-3.5 h-3.5"></i>
+                <span>Connect Instagram Now</span>
+            </a>
+        </div>
+    </div>
+    {% else %}
+
+    <!-- Account Connected Badge & Transparency Bar -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center font-bold">
+                <i data-lucide="instagram" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-black text-slate-900">@{{ perf_data.account.username }}</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span> Live Meta Connection
+                    </span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">
+                    {{ perf_data.message }}
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 text-[11px] font-bold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span>Pure Python calculations — Gemini called on-demand only</span>
+        </div>
+    </div>
+
+    <!-- Observed Metrics Grid (6 Metrics) -->
+    <div class="space-y-2">
+        <div class="flex items-center justify-between">
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <i data-lucide="database" class="w-3 h-3 text-[#2451FF]"></i>
+                Observed Performance Metrics (Meta Graph API)
+            </span>
+            <span class="text-[10px] text-slate-400 font-semibold">Analyzed {{ perf_data.post_count }} Posts</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <!-- Metric 1: Reach / Impressions -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-1">
+                <span class="text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">Est. Reach</span>
+                <h4 class="text-xl font-black text-slate-950">{{ perf_data.total_reach|default:0 }}</h4>
+                <span class="text-[10px] text-slate-500 font-medium">Aggregated views</span>
+            </div>
+
+            <!-- Metric 2: Total Likes -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-1">
+                <span class="text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">Total Likes</span>
+                <h4 class="text-xl font-black text-rose-600">{{ perf_data.total_likes|default:0 }}</h4>
+                <span class="text-[10px] text-slate-500 font-medium">Positive reactions</span>
+            </div>
+
+            <!-- Metric 3: Comments -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-1">
+                <span class="text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">Comments</span>
+                <h4 class="text-xl font-black text-blue-600">{{ perf_data.total_comments|default:0 }}</h4>
+                <span class="text-[10px] text-slate-500 font-medium">Discussion depth</span>
+            </div>
+
+            <!-- Metric 4: Est. Saves -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-1">
+                <span class="text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">Est. Saves</span>
+                <h4 class="text-xl font-black text-amber-600">{{ perf_data.total_saves|default:0 }}</h4>
+                <span class="text-[10px] text-slate-500 font-medium">High intent bookmark</span>
+            </div>
+
+            <!-- Metric 5: Est. Shares -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-1">
+                <span class="text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">Est. Shares</span>
+                <h4 class="text-xl font-black text-purple-600">{{ perf_data.total_shares|default:0 }}</h4>
+                <span class="text-[10px] text-slate-500 font-medium">Viral multipliers</span>
+            </div>
+
+            <!-- Metric 6: Engagement Rate -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-1">
+                <span class="text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">Engagement Rate</span>
+                <h4 class="text-xl font-black text-emerald-600">{{ perf_data.avg_engagement_rate|default:0 }}%</h4>
+                <span class="text-[10px] text-slate-500 font-medium">Interactions / Reach</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Coach Strategic Analysis Section (On-Demand) -->
+    <div class="space-y-3">
+        <div class="flex items-center justify-between">
+            <span class="text-[10px] font-black uppercase tracking-wider text-purple-600 flex items-center gap-1.5">
+                <i data-lucide="cpu" class="w-3 h-3 text-purple-600"></i>
+                AI Performance Coach Strategy & Hypotheses
+            </span>
+            {% if latest_report %}
+            <span class="text-[10px] text-slate-400 font-semibold">Generated {{ latest_report.created_at|date:"M d, Y H:i" }}</span>
+            {% endif %}
+        </div>
+
+        <div class="bg-gradient-to-br from-purple-50/40 via-white to-indigo-50/30 rounded-2xl border border-purple-200 p-6 shadow-sm space-y-5">
+            <!-- Strategic Summary -->
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                        <i data-lucide="compass" class="w-4 h-4 text-purple-600"></i>
+                        <span>Executive Strategy Summary</span>
+                    </h3>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-purple-100 text-purple-800">
+                        AI Hypothesis
+                    </span>
+                </div>
+
+                <div class="p-4 bg-white rounded-xl border border-purple-100 shadow-xs text-xs text-slate-800 leading-relaxed" x-text="aiReport.summary || '{{ latest_report.ai_summary|default:"No strategy report generated yet. Click 'Get AI Coach Recommendation' above to evaluate your recent metrics with Gemini."|escapejs }}'">
+                </div>
+            </div>
+
+            <!-- Two-Column: Strengths vs Opportunities -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Strengths -->
+                <div class="bg-white rounded-xl border border-emerald-100 p-4 shadow-xs space-y-2">
+                    <h4 class="text-xs font-black text-emerald-800 flex items-center gap-1.5 uppercase tracking-wider">
+                        <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        Observed Strengths
+                    </h4>
+                    <ul class="text-xs text-slate-700 space-y-2 list-disc list-inside">
+                        <template x-for="(s, idx) in aiReport.strengths" :key="idx">
+                            <li class="leading-relaxed" x-text="s"></li>
+                        </template>
+                        {% if not latest_report %}
+                        <li class="text-slate-400 italic">Generate AI analysis to view detected strengths</li>
+                        {% else %}
+                            {% for s in latest_report.strengths %}
+                            <li class="leading-relaxed" x-show="aiReport.strengths.length === 0">{{ s }}</li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- Growth Opportunities -->
+                <div class="bg-white rounded-xl border border-amber-100 p-4 shadow-xs space-y-2">
+                    <h4 class="text-xs font-black text-amber-800 flex items-center gap-1.5 uppercase tracking-wider">
+                        <i data-lucide="trending-up" class="w-3.5 h-3.5 text-amber-600"></i>
+                        Growth Bottlenecks & Opportunities
+                    </h4>
+                    <ul class="text-xs text-slate-700 space-y-2 list-disc list-inside">
+                        <template x-for="(o, idx) in aiReport.growth_opportunities" :key="idx">
+                            <li class="leading-relaxed" x-text="o"></li>
+                        </template>
+                        {% if not latest_report %}
+                        <li class="text-slate-400 italic">Generate AI analysis to view growth opportunities</li>
+                        {% else %}
+                            {% for o in latest_report.growth_opportunities %}
+                            <li class="leading-relaxed" x-show="aiReport.growth_opportunities.length === 0">{{ o }}</li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Recommended Experiments (Topics & Formats to Test Next) -->
+            <div class="space-y-3 pt-2">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="flask-conical" class="w-3.5 h-3.5 text-indigo-600"></i>
+                        Recommended Experiments (Topics & Formats Worth Testing Next)
+                    </h4>
+                    <span class="text-[10px] text-slate-400 font-semibold">Test & validate with 1-2 reels</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <template x-for="(exp, idx) in aiReport.recommended_experiments" :key="idx">
+                        <div class="bg-white rounded-xl border border-indigo-100 p-3.5 shadow-xs space-y-2 flex flex-col justify-between">
+                            <div class="space-y-1.5">
+                                <span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase bg-indigo-50 text-indigo-700" x-text="exp.format || 'Talking Head'"></span>
+                                <h5 class="text-xs font-black text-slate-900 leading-snug" x-text="exp.topic"></h5>
+                                <p class="text-[11px] text-slate-500" x-text="exp.hypothesis"></p>
+                            </div>
+                            <div class="pt-2 border-t border-slate-50">
+                                <a :href="'{% url 'creator_script_studio' %}?topic=' + encodeURIComponent(exp.topic) + '&notes=' + encodeURIComponent(exp.hypothesis)" class="text-[11px] font-bold text-[#2451FF] hover:underline flex items-center gap-1">
+                                    <span>Script this experiment →</span>
+                                </a>
+                            </div>
+                        </div>
+                    </template>
+
+                    {% if latest_report %}
+                        {% for exp in latest_report.recommended_experiments %}
+                        <div x-show="aiReport.recommended_experiments.length === 0" class="bg-white rounded-xl border border-indigo-100 p-3.5 shadow-xs space-y-2 flex flex-col justify-between">
+                            <div class="space-y-1.5">
+                                <span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase bg-indigo-50 text-indigo-700">{{ exp.format }}</span>
+                                <h5 class="text-xs font-black text-slate-900 leading-snug">{{ exp.topic }}</h5>
+                                <p class="text-[11px] text-slate-500">{{ exp.hypothesis }}</p>
+                            </div>
+                            <div class="pt-2 border-t border-slate-50">
+                                <a href="{% url 'creator_script_studio' %}?topic={{ exp.topic|urlencode }}&notes={{ exp.hypothesis|urlencode }}" class="text-[11px] font-bold text-[#2451FF] hover:underline flex items-center gap-1">
+                                    <span>Script this experiment →</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Best-Performing Posts Table -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-5 space-y-3">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div>
+                <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                    <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
+                    <span>Top-Performing Recent Posts</span>
+                </h3>
+                <p class="text-[11px] text-slate-500">Ranked by verified Meta engagement (Likes + Comments)</p>
+            </div>
+            <span class="text-xs font-bold text-slate-400">Top {{ perf_data.top_posts|length }} Posts</span>
+        </div>
+
+        {% if perf_data.top_posts %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100">
+                        <th class="py-2.5 px-3">Post Caption</th>
+                        <th class="py-2.5 px-3">Format</th>
+                        <th class="py-2.5 px-3 text-right">Likes</th>
+                        <th class="py-2.5 px-3 text-right">Comments</th>
+                        <th class="py-2.5 px-3 text-right">Total Engagement</th>
+                        <th class="py-2.5 px-3 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for p in perf_data.top_posts %}
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-3 px-3 max-w-sm">
+                            <span class="font-bold text-slate-900 line-clamp-1">{{ p.caption|default:"No caption" }}</span>
+                            <span class="text-[10px] text-slate-400">{{ p.timestamp }}</span>
+                        </td>
+                        <td class="py-3 px-3">
+                            <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-slate-100 text-slate-700">
+                                {{ p.media_type }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-3 text-right font-bold text-rose-600">{{ p.likes }}</td>
+                        <td class="py-3 px-3 text-right font-bold text-blue-600">{{ p.comments }}</td>
+                        <td class="py-3 px-3 text-right font-black text-slate-900">{{ p.total_engagement }}</td>
+                        <td class="py-3 px-3 text-center">
+                            <a href="{% url 'creator_script_studio' %}?topic={{ p.caption|urlencode }}&notes=Double-down+on+top+performing+post+mechanics" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition inline-flex items-center gap-1">
+                                <i data-lucide="video" class="w-3 h-3"></i>
+                                <span>Double Down</span>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-xs text-slate-500 py-4 text-center">No posts found in this period.</p>
+        {% endif %}
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+function performanceCoachStudio() {
+    return {
+        isAnalyzing: false,
+        aiReport: {
+            summary: '',
+            strengths: [],
+            growth_opportunities: [],
+            recommended_experiments: []
+        },
+
+        async triggerAIAnalysis() {
+            this.isAnalyzing = true;
+            try {
+                const resp = await fetch("{% url 'creator_performance_coach_ai_analyze_api' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+                const data = await resp.json();
+                if (data.status === 'success') {
+                    this.aiReport = {
+                        summary: data.report.summary,
+                        strengths: data.report.strengths,
+                        growth_opportunities: data.report.growth_opportunities,
+                        recommended_experiments: data.report.recommended_experiments
+                    };
+                    this.$nextTick(() => {
+                        lucide.createIcons();
+                    });
+                } else {
+                    alert(data.message || 'Error running AI coach analysis.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Connection error while contacting AI Coach service.');
+            } finally {
+                this.isAnalyzing = false;
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

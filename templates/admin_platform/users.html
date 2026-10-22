@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}User Management — Super Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">USER MANAGEMENT</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Audit, manage, verify, suspend, ban, or soft-delete platform users.</p>
+        </div>
+        <a href="{% url 'admin_export_csv' %}?type=users" class="px-4 py-2 bg-gradient-to-r from-slate-900 to-rose-950 text-white font-extrabold text-xs rounded-xl shadow">
+            Export Users CSV
+        </a>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
+        <form method="GET" class="w-full grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+                <input type="text" name="q" value="{{ search_q }}" placeholder="Search username, email..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <select name="role" onchange="this.form.submit()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                    <option value="ALL" {% if role_filter == 'ALL' %}selected{% endif %}>Role: All Roles</option>
+                    <option value="CREATOR" {% if role_filter == 'CREATOR' %}selected{% endif %}>Creators</option>
+                    <option value="BRAND" {% if role_filter == 'BRAND' %}selected{% endif %}>Brands</option>
+                    <option value="PLATFORM_ADMIN" {% if role_filter == 'PLATFORM_ADMIN' %}selected{% endif %}>Platform Admins</option>
+                </select>
+            </div>
+            <div>
+                <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                    <option value="ALL" {% if status_filter == 'ALL' %}selected{% endif %}>Status: All Statuses</option>
+                    <option value="ACTIVE" {% if status_filter == 'ACTIVE' %}selected{% endif %}>● Active</option>
+                    <option value="BANNED" {% if status_filter == 'BANNED' %}selected{% endif %}>○ Banned / Suspended</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- User Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b border-slate-100 font-extrabold text-xs text-slate-950 uppercase tracking-wider">
+            User Accounts Database (Showing {{ users.count }})
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                        <th class="p-3.5">User</th>
+                        <th class="p-3.5">Email</th>
+                        <th class="p-3.5">Role</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5">Created</th>
+                        <th class="p-3.5">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-xs font-medium">
+                    {% for u in users %}
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3.5 font-bold text-slate-950">@{{ u.username }}</td>
+                            <td class="p-3.5 text-slate-600 font-mono text-[11px]">{{ u.email }}</td>
+                            <td class="p-3.5">
+                                <span class="px-2.5 py-0.5 text-[10px] font-extrabold rounded-full {% if u.role == 'CREATOR' %}bg-purple-50 text-purple-700 border border-purple-200{% elif u.role == 'BRAND' %}bg-blue-50 text-blue-700 border border-blue-200{% else %}bg-rose-50 text-rose-700 border border-rose-200{% endif %}">
+                                    {{ u.get_role_display }}
+                                </span>
+                            </td>
+                            <td class="p-3.5">
+                                {% if u.is_active %}
+                                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-black text-[10px] rounded-full border border-emerald-200">
+                                        ● ACTIVE
+                                    </span>
+                                {% else %}
+                                    <span class="px-2 py-0.5 bg-rose-50 text-rose-700 font-black text-[10px] rounded-full border border-rose-200">
+                                        ○ BANNED
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3.5 text-slate-400 font-mono text-[11px]">{{ u.created_at|date:"M d, Y" }}</td>
+                            <td class="p-3.5">
+                                <div class="flex items-center gap-1.5">
+                                    <a href="{% url 'admin_impersonate' user_id=u.id %}" onclick="return confirm('Impersonate user @{{ u.username }}?')" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 text-[10px] font-bold rounded-lg border border-purple-200 transition">
+                                        Impersonate
+                                    </a>
+                                    {% if u.is_active %}
+                                        <form method="POST" class="inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                                            <input type="hidden" name="action" value="ban">
+                                            <button type="submit" onclick="return confirm('Ban user @{{ u.username }}?')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-bold rounded-lg border border-rose-200 transition">
+                                                Ban
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="POST" class="inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                                            <input type="hidden" name="action" value="unban">
+                                            <button type="submit" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-lg border border-emerald-200 transition">
+                                                Unban
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="p-8 text-center text-xs text-slate-400">No users found matching query.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Brand Workspace Dashboard — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">Brand Marketplace Command Center</h1>
+            <p class="text-sm text-slate-500">Manage creator promotions, applications, sales attribution, and campaigns.</p>
+        </div>
+        <a href="{% url 'brand_promotions_create' %}" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-2">
+            <i data-lucide="plus" class="w-4 h-4"></i> Create New Promotion
+        </a>
+    </div>
+
+    <!-- 4 Real Data Metric Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-bold uppercase text-slate-400">Total Promotions</p>
+            <h3 class="text-2xl font-black text-slate-900 mt-1">{{ total_promotions }}</h3>
+            <p class="text-[11px] text-indigo-600 font-bold mt-1">{{ active_promotions }} Active Deals</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-bold uppercase text-slate-400">Creator Applications</p>
+            <h3 class="text-2xl font-black text-slate-900 mt-1">{{ total_applications }}</h3>
+            <p class="text-[11px] text-purple-600 font-bold mt-1">{{ interested_creators_count }} Interested</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-bold uppercase text-slate-400">Active Creator Deals</p>
+            <h3 class="text-2xl font-black text-slate-900 mt-1">{{ active_deals }}</h3>
+            <p class="text-[11px] text-emerald-600 font-bold mt-1">In Execution</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-bold uppercase text-slate-400">Total Attributed Revenue</p>
+            <h3 class="text-2xl font-black text-emerald-600 mt-1">${{ revenue|floatformat:2 }}</h3>
+            <p class="text-[11px] text-slate-500 font-bold mt-1">{{ total_sales }} Orders</p>
+        </div>
+    </div>
+
+    <!-- Recent Creator Applications Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-base font-bold text-slate-900">Recent Creator Applications</h3>
+            <a href="{% url 'brand_applications' %}" class="text-xs font-bold text-indigo-600 hover:text-indigo-700">View All &rarr;</a>
+        </div>
+        <div class="divide-y divide-slate-100">
+            {% for app in recent_applications %}
+                <div class="p-4 px-6 flex items-center justify-between hover:bg-slate-50">
+                    <div>
+                        <p class="text-xs font-bold text-slate-900">@{{ app.creator.username }} applied for "{{ app.promotion.title }}"</p>
+                        <p class="text-[11px] text-slate-500">Pitch: {{ app.pitch|truncatewords:10 }}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-extrabold text-emerald-600">${{ app.requested_amount }}</span>
+                        <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-800">
+                            {{ app.status }}
+                        </span>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="p-8 text-center text-slate-400 text-sm">No creator applications yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

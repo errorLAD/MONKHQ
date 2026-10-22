@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+
+{% block title %}My Voice Profile — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Top Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-emerald-100 text-emerald-700 border border-emerald-200">
+                    STYLE SYNTHESIZER
+                </span>
+                <span class="text-xs font-semibold text-slate-400">Algrohack-Inspired Personalization</span>
+            </div>
+            <h1 class="text-2xl font-black text-slate-950 tracking-tight mt-1">My Voice Profile</h1>
+            <p class="text-xs text-slate-500 font-medium mt-0.5">
+                Train AI to write short-form scripts that sound 100% like you. Upload writing samples and synthesize your unique tone, hooks, and vocabulary.
+            </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="document.getElementById('add-sample-modal').classList.remove('hidden')" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 shadow-xs flex items-center gap-1.5 transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>+ Add Voice Sample</span>
+            </button>
+            <form method="POST" action="{% url 'creator_voice_synthesize' %}">
+                {% csrf_token %}
+                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-95 text-white font-extrabold text-xs rounded-xl shadow flex items-center gap-1.5 transition transform hover:-translate-y-0.5">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                    <span>Analyze & Refresh Voice Style</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Active Profile Banner -->
+    <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 shadow-xs">
+                <i data-lucide="mic" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h3 class="font-black text-base text-slate-900">{{ profile.name }}</h3>
+                    {% if profile.is_active %}
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            Active in Script Studio
+                        </span>
+                    {% else %}
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-600">
+                            Paused
+                        </span>
+                    {% endif %}
+                </div>
+                <p class="text-xs text-slate-500 font-medium">
+                    Tone: <strong class="text-slate-800">{{ profile.tone_of_voice }}</strong> • Language: <strong class="text-slate-800">{{ profile.get_preferred_language_display }}</strong> • Samples: <strong class="text-slate-800">{{ samples.count }}</strong>
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <a href="{% url 'creator_script_studio' %}" class="px-4 py-2 bg-slate-900 text-white font-bold text-xs rounded-xl hover:bg-slate-800 transition">
+                Test in Script Studio →
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Grid: Left Style Parameters (7 cols), Right AI Style Summary & Samples (5 cols) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Left: Voice Style Configuration Form (7 cols) -->
+        <div class="lg:col-span-7 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h3 class="font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <i data-lucide="sliders" class="w-3.5 h-3.5 text-emerald-600"></i>
+                    Voice Style Parameters
+                </h3>
+                <span class="text-[10px] text-slate-400">Directly injected into AI prompts</span>
+            </div>
+
+            <form method="POST" class="space-y-4 text-xs font-semibold">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_profile">
+
+                <!-- Profile Name & Active Status -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-700 mb-1">Profile Name</label>
+                        <input type="text" name="name" value="{{ profile.name }}" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold">
+                    </div>
+                    <div class="flex items-center justify-between pt-6">
+                        <div>
+                            <span class="text-xs font-bold text-slate-800 block">Active Status</span>
+                            <span class="text-[10px] text-slate-500 font-normal">Enable for Script Studio</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="is_active" {% if profile.is_active %}checked{% endif %} class="sr-only peer">
+                            <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Niche & Sub-Niche -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-700 mb-1">Creator Niche</label>
+                        <input type="text" name="niche" value="{{ profile.niche }}" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 mb-1">Sub-Niche</label>
+                        <input type="text" name="sub_niche" value="{{ profile.sub_niche }}" placeholder="e.g. AI Automation & SaaS" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+                    </div>
+                </div>
+
+                <!-- Target Audience -->
+                <div>
+                    <label class="block text-slate-700 mb-1">Target Audience</label>
+                    <input type="text" name="target_audience" value="{{ profile.target_audience }}" placeholder="e.g. Aspiring creators, marketing managers, college students" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+                </div>
+
+                <!-- Preferred Language & Typical Length -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-700 mb-1">Preferred Language</label>
+                        <select name="preferred_language" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold">
+                            <option value="ENGLISH" {% if profile.preferred_language == 'ENGLISH' %}selected{% endif %}>English</option>
+                            <option value="HINGLISH" {% if profile.preferred_language == 'HINGLISH' %}selected{% endif %}>Hinglish (Hindi + English)</option>
+                            <option value="HINDI" {% if profile.preferred_language == 'HINDI' %}selected{% endif %}>Hindi (हिंदी)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 mb-1">Typical Script Length</label>
+                        <input type="text" name="typical_script_length" value="{{ profile.typical_script_length }}" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+                    </div>
+                </div>
+
+                <!-- Tone of Voice & Hook Style -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-700 mb-1">Tone of Voice</label>
+                        <input type="text" name="tone_of_voice" value="{{ profile.tone_of_voice }}" placeholder="e.g. High-energy, direct, no BS, casual" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 mb-1">Preferred Hook Style</label>
+                        <input type="text" name="preferred_hook_style" value="{{ profile.preferred_hook_style }}" placeholder="e.g. Shocking stat or contrarian premise" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+                    </div>
+                </div>
+
+                <!-- Common Content Themes -->
+                <div>
+                    <label class="block text-slate-700 mb-1">Core Content Themes & Pillars</label>
+                    <textarea name="common_content_themes" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-medium">{{ profile.common_content_themes }}</textarea>
+                </div>
+
+                <!-- Preferred CTA Style -->
+                <div>
+                    <label class="block text-slate-700 mb-1">Signature Call to Action (CTA)</label>
+                    <input type="text" name="preferred_cta_style" value="{{ profile.preferred_cta_style }}" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-purple-700 font-bold">
+                </div>
+
+                <!-- Words to Use & Words to Avoid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-700 mb-1 text-[11px] font-black uppercase text-emerald-700">
+                            ✓ Signature Words & Slang (Use)
+                        </label>
+                        <textarea name="words_to_use" rows="2" placeholder="e.g. listen up, game-changer, bhai, breakdown" class="w-full px-3 py-2 bg-emerald-50/50 border border-emerald-200 rounded-xl font-medium">{{ profile.words_to_use }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 mb-1 text-[11px] font-black uppercase text-rose-700">
+                            ✕ Clichés & Banned Words (Avoid)
+                        </label>
+                        <textarea name="words_to_avoid" rows="2" placeholder="e.g. delve, tapestry, revolutionize, furthermore" class="w-full px-3 py-2 bg-rose-50/50 border border-rose-200 rounded-xl font-medium">{{ profile.words_to_avoid }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="pt-3 flex items-center justify-between">
+                    <button type="submit" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow transition">
+                        Save Voice Preferences
+                    </button>
+                    <a href="{% url 'creator_script_studio' %}" class="text-xs font-bold text-[#2451FF] hover:underline">
+                        Apply in Script Studio →
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right: AI Synthesized Style Summary & Voice Samples (5 cols) -->
+        <div class="lg:col-span-5 space-y-6">
+
+            <!-- Card 1: AI-Synthesized Style Guide -->
+            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-6 rounded-3xl shadow-xl space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-white/10">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+                        <h3 class="font-black text-xs uppercase tracking-wider text-emerald-400">AI Synthesized Style Guide</h3>
+                    </div>
+                    <form method="POST" action="{% url 'creator_voice_synthesize' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="text-[10px] text-purple-300 hover:text-white font-bold underline">
+                            Re-analyze
+                        </button>
+                    </form>
+                </div>
+
+                {% if profile.ai_style_summary %}
+                    <div class="text-xs text-slate-200 leading-relaxed font-sans whitespace-pre-wrap">
+                        {{ profile.ai_style_summary }}
+                    </div>
+                {% else %}
+                    <div class="text-center py-6 space-y-2">
+                        <div class="w-10 h-10 rounded-full bg-white/10 text-slate-400 mx-auto flex items-center justify-center">
+                            <i data-lucide="mic" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-xs text-slate-300 font-medium">No style summary synthesized yet.</p>
+                        <p class="text-[11px] text-slate-400">Add 1 or more samples below and click "Analyze & Refresh Voice Style".</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Card 2: Voice Samples Library -->
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h3 class="font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="layers" class="w-3.5 h-3.5 text-purple-600"></i>
+                            Writing Samples ({{ samples.count }})
+                        </h3>
+                    </div>
+                    <button onclick="document.getElementById('add-sample-modal').classList.remove('hidden')" class="text-xs font-bold text-[#2451FF] hover:underline">
+                        + Add Sample
+                    </button>
+                </div>
+
+                <div class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
+                    {% for sample in samples %}
+                        <div class="p-4 hover:bg-slate-50 transition space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-purple-50 text-purple-700 border border-purple-200">
+                                    {{ sample.get_sample_type_display }}
+                                </span>
+                                <form method="POST" action="{% url 'creator_voice_sample_delete' sample_id=sample.id %}" onsubmit="return confirm('Remove sample \'{{ sample.title|escapejs }}\'?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-slate-400 hover:text-rose-600 p-1" title="Delete sample">
+                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <h4 class="font-bold text-xs text-slate-900">{{ sample.title }}</h4>
+                            <p class="text-[11px] text-slate-600 line-clamp-2 italic whitespace-pre-wrap font-sans">
+                                "{{ sample.content }}"
+                            </p>
+                            {% if sample.performance_notes %}
+                                <span class="text-[10px] text-emerald-600 font-semibold block">
+                                    📈 {{ sample.performance_notes }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <div class="p-8 text-center text-xs text-slate-400 space-y-2">
+                            <p>No writing samples added yet.</p>
+                            <button onclick="document.getElementById('add-sample-modal').classList.remove('hidden')" class="px-3 py-1.5 bg-slate-900 text-white font-bold text-xs rounded-xl shadow">
+                                + Add First Sample
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Card 3: Danger Zone -->
+            <div class="p-4 rounded-2xl border border-rose-200 bg-rose-50/50 flex items-center justify-between">
+                <div>
+                    <h4 class="font-extrabold text-xs text-rose-900">Reset Voice Persona</h4>
+                    <p class="text-[10px] text-rose-700">Delete this profile and remove all associated samples.</p>
+                </div>
+                <form method="POST" action="{% url 'creator_voice_profile_delete' %}" onsubmit="return confirm('Are you sure you want to reset your Voice Profile? This action cannot be undone.');">
+                    {% csrf_token %}
+                    <button type="submit" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow transition">
+                        Reset
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL: Add Writing Sample -->
+<div id="add-sample-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 sm:p-7 space-y-5">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h3 class="font-black text-sm text-slate-950 uppercase tracking-wider">Add Content Sample</h3>
+                    <p class="text-[10px] text-slate-400">Past successful scripts or captions you have written</p>
+                </div>
+            </div>
+            <button onclick="document.getElementById('add-sample-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 p-1">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <form method="POST" action="{% url 'creator_voice_sample_add' %}" class="space-y-4 text-xs font-semibold">
+            {% csrf_token %}
+            <div>
+                <label class="block text-slate-700 mb-1">Sample Title <span class="text-rose-500">*</span></label>
+                <input type="text" name="title" required placeholder="e.g. 500k View ChatGPT Prompt Breakdown" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-slate-700 mb-1">Sample Type</label>
+                    <select name="sample_type" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold">
+                        <option value="REEL_SCRIPT">Reel Script</option>
+                        <option value="CAPTION">Social Post Caption</option>
+                        <option value="TRANSCRIPT">Video Transcript</option>
+                        <option value="NOTES">Speaking Notes / Hook</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-700 mb-1">Performance Note (Optional)</label>
+                    <input type="text" name="performance_notes" placeholder="e.g. 250k views on IG" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-slate-700 mb-1">Sample Text Content <span class="text-rose-500">*</span></label>
+                <textarea name="content" rows="6" required placeholder="Paste the actual script or caption words here..." class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl font-medium"></textarea>
+            </div>
+
+            <div class="pt-2 flex items-center justify-end gap-2">
+                <button type="button" onclick="document.getElementById('add-sample-modal').classList.add('hidden')" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-extrabold rounded-xl shadow">Save Voice Sample</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

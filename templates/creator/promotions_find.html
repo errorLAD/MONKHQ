@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Find Brand Promotions — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Brand Promotions Marketplace</h1>
+        <p class="text-sm text-slate-500">Discover verified brand collaboration deals, apply directly, or express interest.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for promo in promotions %}
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 bg-purple-50 text-purple-700 text-[10px] font-bold rounded-full border border-purple-200">
+                            {{ promo.category }}
+                        </span>
+                        <span class="text-lg font-black text-emerald-600">${{ promo.budget }} {{ promo.get_compensation_type_display }}</span>
+                    </div>
+                    <h3 class="text-lg font-extrabold text-slate-900">{{ promo.title }}</h3>
+                    <p class="text-xs text-slate-600 line-clamp-3">{{ promo.description }}</p>
+                    <div class="pt-2 text-[11px] text-slate-500 font-semibold space-y-1">
+                        <p>Brand: <span class="font-bold text-slate-800">@{{ promo.brand.username }}</span></p>
+                        <p>Deliverables: <span class="font-bold text-slate-800">{{ promo.deliverables_required }}</span></p>
+                        <p>Min Followers Required: <span class="font-bold text-slate-800">{{ promo.min_followers }}+</span></p>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex items-center gap-3">
+                    <form method="POST" class="flex-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="promotion_id" value="{{ promo.id }}">
+                        <input type="hidden" name="action" value="interest">
+                        <button type="submit" class="w-full py-2.5 bg-rose-50 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl hover:bg-rose-100 transition flex items-center justify-center gap-1.5">
+                            <i data-lucide="heart" class="w-4 h-4"></i> I'M INTERESTED
+                        </button>
+                    </form>
+
+                    <form method="POST" class="flex-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="promotion_id" value="{{ promo.id }}">
+                        <input type="hidden" name="action" value="apply">
+                        <button type="submit" class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl hover:bg-purple-700 transition flex items-center justify-center gap-1.5">
+                            <i data-lucide="send" class="w-4 h-4"></i> Apply Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-span-2 p-12 bg-white rounded-2xl border border-slate-200 text-center text-slate-400 text-sm">
+                No active promotions listed in marketplace.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

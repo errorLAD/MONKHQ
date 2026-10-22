@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Promotion Deal — Creator Portal{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">CREATE PROMOTION DEAL OFFER</h1>
+            <p class="text-xs text-slate-500">Offer custom sponsorship placements and rate cards directly to interested brands.</p>
+        </div>
+    </div>
+
+    <!-- Create Offer Card -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs max-w-2xl">
+        <form method="POST" action="{% url 'creator_promotions_find' %}" class="space-y-4 text-xs font-semibold">
+            {% csrf_token %}
+            <div>
+                <label class="block text-slate-700 font-extrabold mb-1">Deal Title</label>
+                <input type="text" name="title" placeholder="e.g. Dedicated Instagram Reel + Story Bundle" required class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+            </div>
+            <div>
+                <label class="block text-slate-700 font-extrabold mb-1">Description & Deliverables</label>
+                <textarea name="description" rows="3" placeholder="Describe post format, deliverables, and turnaround time..." class="w-full px-3 py-2 border border-slate-300 rounded-xl"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-slate-700 font-extrabold mb-1">Budget / Asking Rate (₹)</label>
+                    <input type="number" name="budget" placeholder="15000" required class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-slate-700 font-extrabold mb-1">Category / Niche</label>
+                    <input type="text" name="category" placeholder="Tech & Lifestyle" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+            </div>
+            <button type="submit" class="w-full py-3 bg-gradient-to-r from-[#6b46f0] to-[#e93d9a] text-white font-extrabold text-xs rounded-full shadow hover:opacity-95 transition">
+                Publish Promotion Offer
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

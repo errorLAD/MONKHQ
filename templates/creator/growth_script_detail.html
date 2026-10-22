@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ script.title }} — Script Studio Editor{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Top Navigation Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'creator_script_studio' %}" class="p-2 text-slate-500 hover:text-slate-900 bg-white border border-slate-200 rounded-xl transition">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            </a>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                        {{ script.language }}
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-700">
+                        Version v{{ script.version_number }}
+                    </span>
+                    <span class="text-xs text-slate-400 font-mono">Last edited: {{ script.updated_at|date:"M d, Y H:i" }}</span>
+                </div>
+                <h1 class="text-xl font-black text-slate-950 mt-0.5">{{ script.title }}</h1>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="copyFormattedScript()" id="copy-btn" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 shadow-xs flex items-center gap-1.5 transition">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span id="copy-text">Copy Script</span>
+            </button>
+            <form method="POST" action="{% url 'creator_script_delete' script_id=script.id %}" onsubmit="return confirm('Permanently delete this script and its version history?');">
+                {% csrf_token %}
+                <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 bg-white border border-slate-200 rounded-xl transition" title="Delete Script">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Grid: Left Editor (8 cols), Right Tools & Versions (4 cols) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Left: Script Editor Form (8 cols) -->
+        <div class="lg:col-span-8 space-y-6">
+            <form method="POST" class="space-y-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="save_edits">
+
+                <!-- Title & Topic -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Script Title</label>
+                        <input type="text" name="title" value="{{ script.title }}" required class="w-full px-3.5 py-2 text-xs font-bold bg-slate-50 border border-slate-300 rounded-xl focus:bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Topic</label>
+                        <input type="text" value="{{ script.topic }}" disabled class="w-full px-3.5 py-2 text-xs font-semibold bg-slate-100 border border-slate-200 rounded-xl text-slate-500">
+                    </div>
+                </div>
+
+                <!-- 5 Alternative Hooks -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-black uppercase text-slate-700">
+                        Select Primary Hook (or edit custom hook below)
+                    </label>
+                    <div class="space-y-2">
+                        {% for hook in script.hooks %}
+                            <div onclick="selectHookText('{{ hook|escapejs }}')" class="p-2.5 rounded-xl border text-xs font-medium cursor-pointer transition flex items-center justify-between {% if script.selected_hook == hook %}bg-purple-50 border-purple-300 text-purple-950 font-bold{% else %}bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700{% endif %}">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-4 h-4 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[9px] font-black">{{ forloop.counter }}</span>
+                                    <span>{{ hook }}</span>
+                                </div>
+                                {% if script.selected_hook == hook %}
+                                    <span class="text-[9px] font-black text-purple-700 uppercase">Selected</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="pt-2">
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1">Active Hook Text</label>
+                        <input type="text" name="selected_hook" id="hook-input" value="{{ script.selected_hook }}" class="w-full px-3.5 py-2 text-xs font-bold bg-slate-50 border border-slate-300 rounded-xl">
+                    </div>
+                </div>
+
+                <!-- Complete Talking Script Body -->
+                <div>
+                    <label class="block text-xs font-black uppercase text-slate-700 mb-1">Full Talking Script Body</label>
+                    <textarea name="script_body" id="script-body-input" rows="10" required class="w-full p-4 text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl leading-relaxed focus:bg-white">{{ script.script_body }}</textarea>
+                </div>
+
+                <!-- On-Screen Text & CTA -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Suggested On-Screen Text</label>
+                        <textarea name="on_screen_text" rows="3" class="w-full px-3.5 py-2 text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl">{{ script.on_screen_text }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Call to Action (CTA)</label>
+                        <textarea name="cta" rows="3" class="w-full px-3.5 py-2 text-xs font-bold text-purple-700 bg-slate-50 border border-slate-300 rounded-xl">{{ script.cta }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Caption & Hashtags -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Instagram Caption & Hashtags</label>
+                    <textarea name="caption" id="caption-input" rows="4" class="w-full p-3 text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl">{{ script.caption }}</textarea>
+                </div>
+
+                <!-- Filming & Editing Tips -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Filming & Editing Directives</label>
+                    <textarea name="filming_tips" rows="2" class="w-full px-3.5 py-2 text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl">{{ script.filming_tips }}</textarea>
+                </div>
+
+                <!-- Save Button -->
+                <div class="pt-2 flex items-center justify-end">
+                    <button type="submit" class="px-6 py-2.5 bg-[#2451FF] hover:bg-blue-700 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow transition">
+                        Save Script Edits
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right: Actions, Language Switcher, Version History (4 cols) -->
+        <div class="lg:col-span-4 space-y-6">
+
+            <!-- Card 1: Create New Version Snapshot -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                <h3 class="font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="git-branch" class="w-3.5 h-3.5 text-purple-600"></i>
+                    Create New Version
+                </h3>
+                <p class="text-[11px] text-slate-500">
+                    Snapshots the current script as v{{ script.version_number }} and increments to v{{ script.version_number|add:1 }}.
+                </p>
+                <form method="POST" action="{% url 'creator_script_create_version' script_id=script.id %}" class="space-y-2">
+                    {% csrf_token %}
+                    <input type="text" name="change_summary" placeholder="e.g. Swapped hook for shocking stat" required class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl">
+                    <button type="submit" class="w-full py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs rounded-xl border border-purple-200 transition">
+                        + Snapshot Version v{{ script.version_number|add:1 }}
+                    </button>
+                </form>
+            </div>
+
+            <!-- Card 2: Language Switcher / Translator -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                <h3 class="font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="languages" class="w-3.5 h-3.5 text-blue-600"></i>
+                    Translate / Switch Language
+                </h3>
+                <p class="text-[11px] text-slate-500">
+                    Regenerate this script in Hindi, Hinglish, or English while preserving topic and voice profile.
+                </p>
+                <form method="POST" class="space-y-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="change_language">
+                    <select name="target_language" class="w-full px-3 py-2 text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl">
+                        <option value="ENGLISH" {% if script.language == 'ENGLISH' %}selected{% endif %}>English</option>
+                        <option value="HINGLISH" {% if script.language == 'HINGLISH' %}selected{% endif %}>Hinglish</option>
+                        <option value="HINDI" {% if script.language == 'HINDI' %}selected{% endif %}>Hindi (हिंदी)</option>
+                    </select>
+                    <button type="submit" onclick="return confirm('Translate script into selected language? A snapshot of the current version will be saved.');" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition">
+                        Translate Script
+                    </button>
+                </form>
+            </div>
+
+            <!-- Card 3: Version History Timeline -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-100 font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center justify-between">
+                    <span>Version History</span>
+                    <span class="text-[10px] text-slate-400 font-mono">{{ versions.count }} snapshot(s)</span>
+                </div>
+                <div class="p-4 space-y-3 max-h-96 overflow-y-auto">
+                    {% for ver in versions %}
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                            <div class="flex items-center justify-between text-xs font-bold">
+                                <span class="text-purple-700">v{{ ver.version_number }}</span>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ ver.created_at|date:"M d, H:i" }}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-700 font-medium">{{ ver.change_summary }}</p>
+                            <p class="text-[10px] text-slate-500 italic line-clamp-1">"{{ ver.selected_hook|default:ver.script_body|truncatechars:60 }}"</p>
+                        </div>
+                    {% empty %}
+                        <p class="text-xs text-slate-400 text-center py-4">No older versions saved yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function selectHookText(hookText) {
+    document.getElementById('hook-input').value = hookText;
+}
+
+function copyFormattedScript() {
+    let hook = document.getElementById('hook-input').value;
+    let body = document.getElementById('script-body-input').value;
+    let caption = document.getElementById('caption-input').value;
+
+    let fullText = `HOOK:\n${hook}\n\nSCRIPT:\n${body}\n\nCAPTION:\n${caption}`;
+    navigator.clipboard.writeText(fullText).then(() => {
+        let textSpan = document.getElementById('copy-text');
+        textSpan.innerText = 'Copied to Clipboard!';
+        setTimeout(() => { textSpan.innerText = 'Copy Script'; }, 2000);
+    });
+}
+</script>
+{% endblock %}

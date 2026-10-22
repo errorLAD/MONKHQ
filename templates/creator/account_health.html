@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Account Health & Safety Engine — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+    <!-- Header Row -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-1 border-b border-[#E4E7EC]">
+        <div>
+            <h1 class="text-[1.02rem] font-[650] text-[#101828]">Account Health & Safety Engine (IG Shield)</h1>
+            <p class="text-[0.72rem] text-[#475467]">Live send-pacing & queue management against Meta API quotas.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-[0.66rem] font-bold bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6] shadow-card">
+                <span class="w-2 h-2 rounded-full bg-[#067647] animate-pulse mr-1.5"></span> Live Send-Rate: 28 DMs/min (Optimal)
+            </span>
+        </div>
+    </div>
+
+    <!-- MAIN IG SHIELD PANEL -->
+    <div class="bg-white rounded-xl border border-[#E4E7EC] shadow-card overflow-hidden p-4 md:p-6 space-y-4">
+        
+        <!-- LIVE DISPATCH PIPELINE (TRAVELING SIGNAL LINE) -->
+        <div class="bg-[#FAFAFB] p-4 rounded-xl border border-[#E4E7EC] space-y-3">
+            <p class="text-[0.6rem] font-bold uppercase tracking-[0.05em] text-[#98A2B3]">LIVE DISPATCH PIPELINE (TRAVELING SIGNAL LINE)</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+                <!-- Step 1 (Active Highlighted) -->
+                <div class="bg-white p-3 rounded-lg border-2 border-[#2451FF] shadow-card text-center">
+                    <p class="text-[0.72rem] font-bold text-[#101828]">Trigger Event</p>
+                    <p class="text-[0.62rem] text-[#475467]">Comment / DM</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-white p-3 rounded-lg border border-[#E4E7EC] shadow-card text-center">
+                    <p class="text-[0.72rem] font-bold text-[#101828]">Smart-Wait Queue</p>
+                    <p class="text-[0.62rem] text-[#475467]">Paced (30ms)</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bg-white p-3 rounded-lg border border-[#E4E7EC] shadow-card text-center">
+                    <p class="text-[0.72rem] font-bold text-[#101828]">AI Variant</p>
+                    <p class="text-[0.62rem] text-[#475467]">Rotated Copy</p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="bg-white p-3 rounded-lg border border-[#E4E7EC] shadow-card text-center">
+                    <p class="text-[0.72rem] font-bold text-[#101828]">Meta Graph API</p>
+                    <p class="text-[0.62rem] text-[#475467]">v19.0 Endpoint</p>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="bg-white p-3 rounded-lg border border-[#E4E7EC] shadow-card text-center">
+                    <p class="text-[0.72rem] font-bold text-[#101828]">Delivered</p>
+                    <p class="text-[0.62rem] text-[#475467]">Recipient DM</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 LIVE PIPELINE METRIC CARDS -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-[#FAFAFB] p-3.5 rounded-xl border border-[#E4E7EC]">
+                <p class="text-[0.6rem] font-bold text-[#475467]">In-Queue Depth</p>
+                <p class="text-[1.15rem] font-bold text-[#101828] tabular-nums mt-1">3</p>
+            </div>
+
+            <div class="bg-[#FAFAFB] p-3.5 rounded-xl border border-[#E4E7EC]">
+                <p class="text-[0.6rem] font-bold text-[#475467]">In-Flight</p>
+                <p class="text-[1.15rem] font-bold text-[#2451FF] tabular-nums mt-1">1</p>
+            </div>
+
+            <div class="bg-[#FAFAFB] p-3.5 rounded-xl border border-[#E4E7EC]">
+                <p class="text-[0.6rem] font-bold text-[#475467]">Delivered Today</p>
+                <p class="text-[1.15rem] font-bold text-[#067647] tabular-nums mt-1">1,844</p>
+            </div>
+
+            <div class="bg-[#FAFAFB] p-3.5 rounded-xl border border-[#E4E7EC]">
+                <p class="text-[0.6rem] font-bold text-[#475467]">Limit Breaches</p>
+                <p class="text-[1.15rem] font-bold text-[#101828] font-mono tabular-nums mt-1">0 (Reset 24h)</p>
+            </div>
+        </div>
+
+        <!-- SAFETY NOTICE BOX -->
+        <div class="p-3 bg-[#EFF8FF] border border-[#B2DDFF] rounded-lg text-[0.68rem] text-[#175CD3] flex items-start gap-2">
+            <i data-lucide="info" class="w-4 h-4 text-[#175CD3] shrink-0 mt-0.5"></i>
+            <div>
+                <span class="font-bold">Safety Notice:</span> Intelligent queue pacing and AI message variation reduce spam-filter risk — platform immunity cannot be guaranteed. MonkHQ uses only official Meta Graph API endpoints.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 4 SUMMARY STAT CARDS BELOW -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        
+        <!-- Comments Automated -->
+        <div class="bg-white p-4 rounded-xl border border-[#E4E7EC] shadow-card flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <p class="text-[0.6rem] font-bold uppercase tracking-[0.05em] text-[#475467]">COMMENTS AUTOMATED</p>
+                <i data-lucide="message-square" class="w-4 h-4 text-[#2451FF]"></i>
+            </div>
+            <div class="mt-2">
+                <h3 class="text-[1.15rem] font-bold text-[#101828] tabular-nums">2,360</h3>
+                <p class="text-[0.66rem] font-semibold text-[#067647] mt-0.5">+18.4% this week</p>
+            </div>
+        </div>
+
+        <!-- DMs Delivered -->
+        <div class="bg-white p-4 rounded-xl border border-[#E4E7EC] shadow-card flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <p class="text-[0.6rem] font-bold uppercase tracking-[0.05em] text-[#475467]">DMS DELIVERED</p>
+                <i data-lucide="zap" class="w-4 h-4 text-[#2451FF]"></i>
+            </div>
+            <div class="mt-2">
+                <h3 class="text-[1.15rem] font-bold text-[#101828] tabular-nums">1,840</h3>
+                <p class="text-[0.66rem] font-semibold text-[#2451FF] mt-0.5">100% Delivery Success Rate</p>
+            </div>
+        </div>
+
+        <!-- Leads Captured -->
+        <div class="bg-white p-4 rounded-xl border border-[#E4E7EC] shadow-card flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <p class="text-[0.6rem] font-bold uppercase tracking-[0.05em] text-[#475467]">LEADS CAPTURED</p>
+                <i data-lucide="target" class="w-4 h-4 text-[#B42318]"></i>
+            </div>
+            <div class="mt-2">
+                <h3 class="text-[1.15rem] font-bold text-[#101828] tabular-nums">145</h3>
+                <p class="text-[0.66rem] font-semibold text-[#B42318] mt-0.5">Conversion: 26.2%</p>
+            </div>
+        </div>
+
+        <!-- Total Revenue -->
+        <div class="bg-white p-4 rounded-xl border border-[#E4E7EC] shadow-card flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <p class="text-[0.6rem] font-bold uppercase tracking-[0.05em] text-[#475467]">TOTAL REVENUE</p>
+                <i data-lucide="dollar-sign" class="w-4 h-4 text-[#067647]"></i>
+            </div>
+            <div class="mt-2">
+                <h3 class="text-[1.15rem] font-bold text-[#101828] tabular-nums">$3,420.00</h3>
+                <p class="text-[0.66rem] font-semibold text-[#067647] mt-0.5">From Digital Products</p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

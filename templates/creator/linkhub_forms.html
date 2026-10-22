@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Lead Capture Forms — Link Hub{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">Lead Capture Forms</h1>
+            <p class="text-xs text-slate-500">Add embedded contact forms and email signup blocks to build your audience.</p>
+        </div>
+        <a href="{% url 'creator_linkhub_main' %}" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200 transition">
+            ← Back to Editor
+        </a>
+    </div>
+
+    <!-- Create Form Block -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Add Form Block to Link Hub</h3>
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Block Heading</label>
+                <input type="text" name="title" placeholder="e.g. 📩 Work With Me / Inquiry" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Form Type</label>
+                <select name="form_type" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                    <option value="CONTACT_FORM">Full Contact / Lead Form (Name, Email, Phone, Note)</option>
+                    <option value="EMAIL_SIGNUP">Quick Email Newsletter Signup</option>
+                </select>
+            </div>
+            <div class="md:col-span-2">
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">
+                    + Enable Lead Form Block
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Form Blocks List -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden divide-y divide-slate-100">
+        {% for item in form_items %}
+            <div class="p-4 flex items-center justify-between hover:bg-slate-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                        <i data-lucide="file-input" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-extrabold text-slate-900">{{ item.title }}</h4>
+                        <p class="text-[10px] text-slate-400 font-medium">{{ item.get_item_type_display }}</p>
+                    </div>
+                </div>
+                <a href="{% url 'creator_linkhub_item_delete_api' item_id=item.id %}" class="text-rose-500 hover:text-rose-700 text-xs font-bold">Remove Form</a>
+            </div>
+        {% empty %}
+            <div class="p-8 text-center text-xs text-slate-400 font-semibold">No lead capture forms added to Link Hub.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

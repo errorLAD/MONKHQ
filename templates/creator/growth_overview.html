@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+
+{% block title %}Creator Growth Studio — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Top Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xs">
+                    ALGROHACK-STYLE SUITE
+                </span>
+                <span class="text-xs font-semibold text-slate-400">Algorithmic Creator Growth</span>
+            </div>
+            <h1 class="text-2xl font-black text-slate-950 tracking-tight mt-1">Creator Growth Studio</h1>
+            <p class="text-xs text-slate-500 font-medium mt-0.5">
+                Discover breakout niche content, decode viral mechanics, and generate personalized Reel scripts in your authentic voice.
+            </p>
+        </div>
+        
+        <div class="flex items-center gap-2.5">
+            <a href="{% url 'creator_viral_finder' %}" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 shadow-xs flex items-center gap-1.5 transition">
+                <i data-lucide="flame" class="w-3.5 h-3.5 text-rose-500"></i>
+                <span>Viral Finder</span>
+            </a>
+            <a href="{% url 'creator_script_studio' %}" class="px-4 py-2 bg-gradient-to-r from-[#2451FF] to-[#6b46f0] hover:opacity-95 text-white font-extrabold text-xs rounded-xl shadow flex items-center gap-1.5 transition transform hover:-translate-y-0.5">
+                <i data-lucide="video" class="w-3.5 h-3.5"></i>
+                <span>+ Launch Script Studio</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 4 Metric Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1: Saved Scripts -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+            <div class="space-y-1">
+                <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Saved Scripts</span>
+                <h3 class="text-2xl font-black text-slate-950">{{ total_scripts }}</h3>
+                <span class="text-[10px] text-slate-500 font-medium">Reel scripts in library</span>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#2451FF] flex items-center justify-center">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+            </div>
+        </div>
+
+        <!-- Card 2: Voice Profile -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+            <div class="space-y-1">
+                <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Voice Persona</span>
+                {% if voice_profile and voice_profile.is_active %}
+                    <h3 class="text-sm font-black text-emerald-600 flex items-center gap-1">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> Active Persona
+                    </h3>
+                    <span class="text-[10px] text-slate-500 font-medium">{{ voice_profile.samples.count }} writing sample(s)</span>
+                {% else %}
+                    <h3 class="text-sm font-black text-amber-600 flex items-center gap-1">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i> Setup Needed
+                    </h3>
+                    <a href="{% url 'creator_voice_profile' %}" class="text-[10px] text-[#2451FF] font-bold hover:underline">Build Profile →</a>
+                {% endif %}
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i data-lucide="mic" class="w-5 h-5"></i>
+            </div>
+        </div>
+
+        <!-- Card 3: Saved Inspirations -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+            <div class="space-y-1">
+                <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Inspirations</span>
+                <h3 class="text-2xl font-black text-purple-600">{{ total_inspirations }}</h3>
+                <span class="text-[10px] text-slate-500 font-medium">Bookmarked breakout videos</span>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <i data-lucide="bookmark" class="w-5 h-5"></i>
+            </div>
+        </div>
+
+        <!-- Card 4: Discovered Content -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+            <div class="space-y-1">
+                <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Discovered Content</span>
+                <h3 class="text-2xl font-black text-rose-500">{{ total_discovered }}</h3>
+                <span class="text-[10px] text-slate-500 font-medium">Niche videos analyzed</span>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
+                <i data-lucide="flame" class="w-5 h-5"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4 Growth Studio Core Modules Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Module 1: Content Ideas -->
+        <a href="{% url 'creator_content_ideas' %}" class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:border-amber-300 hover:shadow-md transition group flex flex-col justify-between space-y-3">
+            <div class="space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-105 transition">
+                    <i data-lucide="lightbulb" class="w-5 h-5"></i>
+                </div>
+                <h4 class="text-sm font-black text-slate-900 group-hover:text-amber-600 transition">Content Ideas</h4>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Generate viral reel concepts in batches using Gemini, voice persona, and niche hooks.
+                </p>
+            </div>
+            <span class="text-[11px] font-bold text-amber-600 inline-flex items-center gap-1 pt-1">
+                Generate Ideas →
+            </span>
+        </a>
+
+        <!-- Module 2: Content Calendar -->
+        <a href="{% url 'creator_content_calendar' %}" class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:border-sky-300 hover:shadow-md transition group flex flex-col justify-between space-y-3">
+            <div class="space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center group-hover:scale-105 transition">
+                    <i data-lucide="calendar" class="w-5 h-5"></i>
+                </div>
+                <h4 class="text-sm font-black text-slate-900 group-hover:text-sky-600 transition">Content Calendar</h4>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Organize your pipeline from raw idea to film-ready reels and published posts.
+                </p>
+            </div>
+            <span class="text-[11px] font-bold text-sky-600 inline-flex items-center gap-1 pt-1">
+                Open Calendar →
+            </span>
+        </a>
+
+        <!-- Module 3: Inspiration Library -->
+        <a href="{% url 'creator_inspiration_library' %}" class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:border-indigo-300 hover:shadow-md transition group flex flex-col justify-between space-y-3">
+            <div class="space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-105 transition">
+                    <i data-lucide="bookmark" class="w-5 h-5"></i>
+                </div>
+                <h4 class="text-sm font-black text-slate-900 group-hover:text-indigo-600 transition">Inspiration Library</h4>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Save viral hooks, captions, video references, and notes with 1-click script studio launch.
+                </p>
+            </div>
+            <span class="text-[11px] font-bold text-indigo-600 inline-flex items-center gap-1 pt-1">
+                Browse Library →
+            </span>
+        </a>
+
+        <!-- Module 4: Performance Coach -->
+        <a href="{% url 'creator_performance_coach' %}" class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:border-purple-300 hover:shadow-md transition group flex flex-col justify-between space-y-3">
+            <div class="space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-105 transition">
+                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                </div>
+                <h4 class="text-sm font-black text-slate-900 group-hover:text-purple-600 transition">Performance Coach</h4>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Analyze genuine Meta Graph API insights and request on-demand Gemini AI strategies.
+                </p>
+            </div>
+            <span class="text-[11px] font-bold text-purple-600 inline-flex items-center gap-1 pt-1">
+                View Insights →
+            </span>
+        </a>
+    </div>
+
+    <!-- AI Engine Optimization & Quota Safeguards -->
+
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="cpu" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs font-black text-slate-900">AI Engine Optimization & Safeguards</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span> Gemini Active
+                    </span>
+                    {% if ai_usage_stats.cache_hit_rate_pct > 0 %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                        <i data-lucide="zap" class="w-2.5 h-2.5 mr-1 text-blue-500"></i> {{ ai_usage_stats.cache_hit_rate_pct }}% Cached (0 Tokens)
+                    </span>
+                    {% endif %}
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">
+                    Real-time token tracking, response deduplication cache, and abuse safeguards active.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-6 border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-6 text-xs">
+            <div>
+                <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">24h Requests</span>
+                <span class="font-extrabold text-slate-800">{{ ai_usage_stats.total_requests }} <span class="text-[10px] font-normal text-slate-400">({{ ai_usage_stats.cached_requests }} saved)</span></span>
+            </div>
+            <div>
+                <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Tokens Used</span>
+                <span class="font-extrabold text-slate-800">{{ ai_usage_stats.total_tokens }}</span>
+            </div>
+            <div>
+                <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Est. Cost (USD)</span>
+                <span class="font-extrabold text-emerald-600">${{ ai_usage_stats.total_cost_usd|floatformat:4 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- The 3-Step Algrohack Viral Loop Blueprint -->
+    <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-7 text-white shadow-xl relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="max-w-3xl space-y-4">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[10px] font-black uppercase tracking-wider text-purple-200">
+                <i data-lucide="zap" class="w-3 h-3 text-amber-400"></i>
+                THE VIRAL CREATOR GROWTH LOOP
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white leading-snug">
+                How Top Short-Form Creators Consistently Scale on Instagram & Shorts
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed">
+                MonkHQ connects the 3 essential pillars of viral production: Find what the algorithm is rewarding, decode why it hooked audiences, and generate original talking scripts tailored to your personal voice.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 mt-4 border-t border-white/10">
+            <!-- Step 1 -->
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2 hover:bg-white/10 transition">
+                <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 text-xs font-black flex items-center justify-center">1</span>
+                    <h4 class="font-extrabold text-xs text-white">Find Breakouts</h4>
+                </div>
+                <p class="text-[11px] text-slate-300">
+                    Use <strong>Viral Finder</strong> to discover videos outperforming creator averages (2x-5x views) in your niche.
+                </p>
+                <a href="{% url 'creator_viral_finder' %}" class="inline-flex items-center gap-1 text-[11px] font-bold text-rose-300 hover:text-white pt-1">
+                    Open Finder →
+                </a>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2 hover:bg-white/10 transition">
+                <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-black flex items-center justify-center">2</span>
+                    <h4 class="font-extrabold text-xs text-white">Voice Synthesis</h4>
+                </div>
+                <p class="text-[11px] text-slate-300">
+                    Configure your <strong>Voice Profile</strong> with sample scripts so generated copy sounds 100% like you.
+                </p>
+                <a href="{% url 'creator_voice_profile' %}" class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-300 hover:text-white pt-1">
+                    Manage Voice →
+                </a>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2 hover:bg-white/10 transition">
+                <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40 text-xs font-black flex items-center justify-center">3</span>
+                    <h4 class="font-extrabold text-xs text-white">Generate & Shoot</h4>
+                </div>
+                <p class="text-[11px] text-slate-300">
+                    <strong>AI Script Studio</strong> produces 5 hooks, scene-by-scene talking points, captions, and automated DM triggers.
+                </p>
+                <a href="{% url 'creator_script_studio' %}" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-300 hover:text-white pt-1">
+                    Create Script →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2 Column Section: Recent Scripts & Recent Inspirations -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Left: Recent Scripts -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="video" class="w-4 h-4 text-blue-600"></i>
+                    <h3 class="font-extrabold text-xs text-slate-900 uppercase tracking-wider">Recent AI Scripts</h3>
+                </div>
+                <a href="{% url 'creator_script_studio' %}" class="text-[11px] font-bold text-[#2451FF] hover:underline">
+                    View Library ({{ total_scripts }}) →
+                </a>
+            </div>
+
+            <div class="divide-y divide-slate-100 flex-1">
+                {% for sc in recent_scripts %}
+                    <div class="p-4 hover:bg-slate-50 transition flex items-start justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                                    {{ sc.language }}
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-600">
+                                    v{{ sc.version_number }}
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ sc.updated_at|date:"M d, Y" }}</span>
+                            </div>
+                            <h4 class="font-extrabold text-xs text-slate-900 leading-snug">
+                                <a href="{% url 'creator_script_detail' script_id=sc.id %}" class="hover:text-[#2451FF]">
+                                    {{ sc.title }}
+                                </a>
+                            </h4>
+                            <p class="text-[11px] text-slate-500 line-clamp-1 italic">
+                                "{{ sc.selected_hook|default:sc.script_body|truncatechars:85 }}"
+                            </p>
+                        </div>
+                        <a href="{% url 'creator_script_detail' script_id=sc.id %}" class="px-2.5 py-1 text-slate-700 hover:text-[#2451FF] hover:bg-blue-50 font-bold text-xs rounded-lg transition border border-slate-200 flex items-center gap-1 flex-shrink-0">
+                            Edit <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                        </a>
+                    </div>
+                {% empty %}
+                    <div class="p-8 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 mx-auto flex items-center justify-center">
+                            <i data-lucide="video" class="w-6 h-6"></i>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-500">No scripts generated yet.</p>
+                        <a href="{% url 'creator_script_studio' %}" class="inline-block px-4 py-2 bg-[#2451FF] text-white font-extrabold text-xs rounded-xl shadow">
+                            Create First Reel Script
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right: Saved Inspirations & Breakouts -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="bookmark" class="w-4 h-4 text-purple-600"></i>
+                    <h3 class="font-extrabold text-xs text-slate-900 uppercase tracking-wider">Saved Inspirations</h3>
+                </div>
+                <a href="{% url 'creator_viral_finder' %}" class="text-[11px] font-bold text-[#2451FF] hover:underline">
+                    Explore Finder →
+                </a>
+            </div>
+
+            <div class="divide-y divide-slate-100 flex-1">
+                {% for insp in recent_inspirations %}
+                    <div class="p-4 hover:bg-slate-50 transition flex items-start justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-200">
+                                    Score: {{ insp.video.breakout_score }}
+                                </span>
+                                <span class="text-[10px] text-purple-600 font-bold">@{{ insp.video.creator_handle }}</span>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ insp.video.views_count|floatformat:0 }} views</span>
+                            </div>
+                            <h4 class="font-extrabold text-xs text-slate-900 leading-snug">
+                                {{ insp.video.title|truncatechars:70 }}
+                            </h4>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                            <a href="{% url 'creator_viral_analyze' video_id=insp.video.id %}" class="px-2 py-1 text-slate-700 hover:text-purple-600 hover:bg-purple-50 font-bold text-[11px] rounded-lg border border-slate-200 transition">
+                                Analyze
+                            </a>
+                            <a href="{% url 'creator_script_studio' %}?ref_video_id={{ insp.video.id }}" class="px-2.5 py-1 bg-gradient-to-r from-[#2451FF] to-[#6b46f0] text-white font-bold text-[11px] rounded-lg shadow transition">
+                                Script
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {% if not recent_inspirations %}
+                    <div class="p-8 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-600 mx-auto flex items-center justify-center">
+                            <i data-lucide="flame" class="w-6 h-6"></i>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-500">No saved inspirations yet.</p>
+                        <div class="flex items-center justify-center">
+                            <a href="{% url 'creator_viral_finder' %}" class="inline-block px-3.5 py-1.5 bg-slate-900 text-white font-extrabold text-xs rounded-xl shadow transition">
+                                Explore Viral Finder
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

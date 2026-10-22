@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Brand Management — Super Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">BRAND MANAGEMENT</h1>
+            <p class="text-xs text-slate-500">Manage brand workspaces, company verification, and campaign budgets.</p>
+        </div>
+    </div>
+
+    <!-- Brands Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b border-slate-100 font-extrabold text-xs text-slate-950 uppercase tracking-wider">
+            Brand Accounts Database ({{ brands.count }})
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                        <th class="p-3.5">Company Name</th>
+                        <th class="p-3.5">User</th>
+                        <th class="p-3.5">Industry</th>
+                        <th class="p-3.5">Verification</th>
+                        <th class="p-3.5">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-xs font-medium">
+                    {% for b in brands %}
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3.5 font-bold text-slate-950">{{ b.company_name }}</td>
+                            <td class="p-3.5 text-blue-600 font-bold">@{{ b.user.username }}</td>
+                            <td class="p-3.5 text-slate-600">{{ b.industry }}</td>
+                            <td class="p-3.5">
+                                {% if b.is_verified %}
+                                    <span class="px-2.5 py-0.5 bg-blue-50 text-blue-700 font-black text-[10px] rounded-full border border-blue-200">
+                                        ✓ VERIFIED BRAND
+                                    </span>
+                                {% else %}
+                                    <span class="px-2.5 py-0.5 bg-slate-100 text-slate-600 font-bold text-[10px] rounded-full">
+                                        Unverified
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3.5">
+                                <form method="POST" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="brand_id" value="{{ b.id }}">
+                                    {% if b.is_verified %}
+                                        <input type="hidden" name="action" value="unverify">
+                                        <button type="submit" class="px-2 py-1 bg-amber-50 text-amber-700 text-[10px] font-bold rounded-lg border border-amber-200">
+                                            Remove Badge
+                                        </button>
+                                    {% else %}
+                                        <input type="hidden" name="action" value="verify">
+                                        <button type="submit" class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-lg border border-blue-200">
+                                            Verify Brand
+                                        </button>
+                                    {% endif %}
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="p-8 text-center text-xs text-slate-400">No brand profiles registered yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Select Login Portal — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-80px)] bg-[#f5f5fa] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+    
+    <!-- Header Logo & Title -->
+    <div class="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-3">
+        <a href="{% url 'home' %}" class="inline-flex items-center gap-2.5 group">
+            <div class="relative w-12 h-12 rounded-2xl bg-gradient-to-r from-[#6b46f0] to-[#e93d9a] flex items-center justify-center text-white font-black text-lg shadow-lg shadow-purple-500/25 group-hover:scale-105 transition">
+                M
+                <span class="w-3 h-3 rounded-full bg-rose-500 border-2 border-white absolute -top-0.5 -right-0.5 animate-pulse"></span>
+            </div>
+            <span class="text-2xl font-black tracking-tight text-slate-950">MonkHQ</span>
+        </a>
+
+        <div>
+            <h2 class="text-2xl font-black text-slate-950 tracking-tight">Select Your Login Portal</h2>
+            <p class="text-xs font-medium text-slate-500 mt-1">Choose your workspace account type to proceed.</p>
+        </div>
+    </div>
+
+    <!-- Portal Cards Grid (2 Columns) -->
+    <div class="mt-8 max-w-2xl mx-auto w-full px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Portal 1: Content Creator -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-xl hover:shadow-2xl hover:border-[#6b46f0]/50 transition duration-200 flex flex-col justify-between space-y-6 group">
+                <div class="space-y-4">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-50 text-[#6b46f0] border border-purple-100 flex items-center justify-center font-black text-xl shadow-xs">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#6b46f0] block mb-1">Creators & Influencers</span>
+                        <h3 class="text-lg font-black text-slate-950 group-hover:text-[#6b46f0] transition">Creator Portal</h3>
+                        <p class="text-xs text-slate-500 font-medium leading-relaxed mt-2">Automate Instagram/Facebook DMs, launch Link Hub storefront, sell digital products, and capture leads.</p>
+                    </div>
+                </div>
+
+                <a href="{% url 'creator_login' %}" class="w-full py-3 bg-gradient-to-r from-[#6b46f0] to-[#e93d9a] hover:opacity-95 text-white font-extrabold text-xs uppercase tracking-wider rounded-full shadow-md transition text-center block">
+                    Login as Creator →
+                </a>
+            </div>
+
+            <!-- Portal 2: Brand / Business -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-xl hover:shadow-2xl hover:border-blue-500/50 transition duration-200 flex flex-col justify-between space-y-6 group">
+                <div class="space-y-4">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center font-black text-xl shadow-xs">
+                        <i data-lucide="building-2" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-blue-600 block mb-1">Brands & Merchants</span>
+                        <h3 class="text-lg font-black text-slate-950 group-hover:text-blue-600 transition">Brand Portal</h3>
+                        <p class="text-xs text-slate-500 font-medium leading-relaxed mt-2">Sponsor creator promotions, launch social campaigns, manage influencer deals, and track revenue attribution.</p>
+                    </div>
+                </div>
+
+                <a href="{% url 'brand_login' %}" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs uppercase tracking-wider rounded-full shadow-md transition text-center block">
+                    Login as Brand →
+                </a>
+            </div>
+
+        </div>
+
+        <div class="mt-8 text-center">
+            <p class="text-xs text-slate-500 font-medium">
+                New to MonkHQ?
+                <a href="{% url 'creator_signup' %}" class="font-extrabold text-[#6b46f0] hover:underline">Create a Free Creator Account</a>
+            </p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

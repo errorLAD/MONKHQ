@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Re-trigger Engine — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">RE-TRIGGER ENGINE</h1>
+            <p class="text-xs text-slate-500">Recover missed opportunities from previous conversations & historical comments.</p>
+        </div>
+    </div>
+
+    <!-- Scan Form -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h3 class="text-xs font-black uppercase text-slate-700">Scan Historical Comments</h3>
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Target Post</label>
+                <select name="media_id" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                    <option value="post_108">Reel #108 (Wireless Earbuds)</option>
+                    <option value="post_105">Reel #105 (Digital Course)</option>
+                    <option value="post_99">Post #99 (Preset Pack)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Keyword</label>
+                <input type="text" name="keyword" value="PRICE" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Date Range</label>
+                <select class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                    <option>Last 30 Days</option>
+                    <option>Last 90 Days</option>
+                    <option>All Time</option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow">
+                    Scan Comments & Queue Celery Job
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Preview Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b border-slate-100 font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center justify-between">
+            <span>Historical Users Preview Table</span>
+            <button onclick="alert('Queued selected eligible users for Celery processing!')" class="px-3 py-1 bg-blue-600 text-white font-bold text-xs rounded-lg">
+                Queue Selected Users
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                        <th class="p-3.5"><input type="checkbox" checked></th>
+                        <th class="p-3.5">User</th>
+                        <th class="p-3.5">Comment</th>
+                        <th class="p-3.5">Post</th>
+                        <th class="p-3.5">Date</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5">Last Contact</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-xs font-medium">
+                    {% for row in users %}
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3.5"><input type="checkbox" {% if row.status == 'Eligible' %}checked{% else %}disabled{% endif %}></td>
+                            <td class="p-3.5 font-bold text-slate-900">{{ row.username }}</td>
+                            <td class="p-3.5 font-semibold text-blue-600">"{{ row.comment }}"</td>
+                            <td class="p-3.5 text-slate-600">{{ row.post }}</td>
+                            <td class="p-3.5 text-slate-500">{{ row.date }}</td>
+                            <td class="p-3.5">
+                                {% if row.status == 'Eligible' %}
+                                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-extrabold text-[10px] rounded-full border border-emerald-200">
+                                        Eligible
+                                    </span>
+                                {% else %}
+                                    <span class="px-2 py-0.5 bg-slate-100 text-slate-600 font-extrabold text-[10px] rounded-full">
+                                        Already Contacted
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3.5 text-slate-500">{{ row.last_contact }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

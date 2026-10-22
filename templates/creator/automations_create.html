@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Automation Wizard — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6" x-data="{ selectedTrigger: 'INSTAGRAM_COMMENT', step: 1 }">
+    
+    <!-- Wizard Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">Create New Automation</h1>
+            <p class="text-xs text-slate-500">Step <span x-text="step">1</span> of 2: Select trigger event and payload rules.</p>
+        </div>
+        <a href="{% url 'creator_automations_list' %}" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200">
+            ← Cancel
+        </a>
+    </div>
+
+    <!-- Step 1: Trigger Picker Cards -->
+    <div x-show="step === 1" class="space-y-4">
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Select Trigger Event</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            
+            <div @click="selectedTrigger = 'INSTAGRAM_COMMENT'" class="p-4 rounded-2xl border-2 cursor-pointer transition space-y-2" :class="selectedTrigger === 'INSTAGRAM_COMMENT' ? 'border-blue-600 bg-blue-50/50 ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'">
+                <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                    <i data-lucide="message-square" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-extrabold text-xs text-slate-900">Instagram Comment</h4>
+                <p class="text-[11px] text-slate-500 leading-snug">Trigger workflow when a user comments on post or Reel.</p>
+            </div>
+
+            <div @click="selectedTrigger = 'FACEBOOK_COMMENT'" class="p-4 rounded-2xl border-2 cursor-pointer transition space-y-2" :class="selectedTrigger === 'FACEBOOK_COMMENT' ? 'border-blue-600 bg-blue-50/50 ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'">
+                <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+                    <i data-lucide="facebook" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-extrabold text-xs text-slate-900">Facebook Comment</h4>
+                <p class="text-[11px] text-slate-500 leading-snug">Trigger workflow when a comment is posted on Facebook Page.</p>
+            </div>
+
+            <div @click="selectedTrigger = 'DM_RECEIVED'" class="p-4 rounded-2xl border-2 cursor-pointer transition space-y-2" :class="selectedTrigger === 'DM_RECEIVED' ? 'border-blue-600 bg-blue-50/50 ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'">
+                <div class="w-9 h-9 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-extrabold text-xs text-slate-900">Incoming DM Keyword</h4>
+                <p class="text-[11px] text-slate-500 leading-snug">Trigger when user sends direct message containing keyword.</p>
+            </div>
+
+            <div @click="selectedTrigger = 'NEW_FOLLOWER'" class="p-4 rounded-2xl border-2 cursor-pointer transition space-y-2" :class="selectedTrigger === 'NEW_FOLLOWER' ? 'border-blue-600 bg-blue-50/50 ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'">
+                <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-extrabold text-xs text-slate-900">New Follower</h4>
+                <p class="text-[11px] text-slate-500 leading-snug">Send welcome DM and store link when a user follows your profile.</p>
+            </div>
+
+            <div @click="selectedTrigger = 'STORY_INTERACTION'" class="p-4 rounded-2xl border-2 cursor-pointer transition space-y-2" :class="selectedTrigger === 'STORY_INTERACTION' ? 'border-blue-600 bg-blue-50/50 ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'">
+                <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold">
+                    <i data-lucide="instagram" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-extrabold text-xs text-slate-900">Story Reply / Mention</h4>
+                <p class="text-[11px] text-slate-500 leading-snug">Respond automatically when user replies to Instagram Story.</p>
+            </div>
+
+            <div @click="selectedTrigger = 'PRODUCT_CLICK'" class="p-4 rounded-2xl border-2 cursor-pointer transition space-y-2" :class="selectedTrigger === 'PRODUCT_CLICK' ? 'border-blue-600 bg-blue-50/50 ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'">
+                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-extrabold text-xs text-slate-900">Storefront Product Click</h4>
+                <p class="text-[11px] text-slate-500 leading-snug">Trigger follow-up DM when user views product on Link Hub.</p>
+            </div>
+
+        </div>
+
+        <div class="flex justify-end pt-4">
+            <button @click="step = 2" class="px-5 py-2.5 bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow">
+                Continue to Configuration →
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 2: Configuration Form -->
+    <div x-show="step === 2" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="trigger_type" :value="selectedTrigger">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Automation Name</label>
+                    <input type="text" name="name" placeholder="e.g. Price Comment to DM Storefront" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Target Keywords</label>
+                    <input type="text" name="keywords" value="PRICE, LINK, BUY" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Action to Execute</label>
+                    <select name="action_type" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                        <option value="SEND_DM">Send Automated DM Payload</option>
+                        <option value="SEND_PRODUCT_LINK">Send Storefront Product Link</option>
+                        <option value="SEND_DIGITAL_PRODUCT">Send Digital Download PDF</option>
+                        <option value="SEND_COUPON">Send Promo Discount Coupon Code</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">User Cooldown Guard</label>
+                    <select name="cooldown" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                        <option value="60">60 Seconds Cooldown</option>
+                        <option value="300">5 Minutes Cooldown</option>
+                        <option value="86400">24 Hours Cooldown</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Automated DM Text Payload</label>
+                <textarea name="dm_text" rows="3" class="w-full p-3 border border-slate-300 rounded-xl text-xs font-semibold" required>Thanks for your comment! Here is your requested product link: https://monkhq.in/@creator</textarea>
+            </div>
+
+            <div class="pt-4 flex items-center justify-between border-t border-slate-100">
+                <button type="button" @click="step = 1" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl">
+                    ← Back
+                </button>
+                <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow">
+                    Save & Deploy Automation
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+
+{% block title %}Content Calendar — Creator Growth Studio — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="contentCalendarStudio()">
+
+    <!-- Top Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-200">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-xs">
+                    PLANNING SUITE
+                </span>
+                <span class="text-xs font-semibold text-slate-400">Creator Growth Studio</span>
+            </div>
+            <h1 class="text-2xl font-black text-slate-950 tracking-tight mt-1">Content Calendar</h1>
+            <p class="text-xs text-slate-500 font-medium mt-0.5">
+                Organize your short-form production pipeline from raw idea to film-ready and published reels.
+            </p>
+        </div>
+        
+        <div class="flex items-center gap-2.5">
+            <button @click="openCreateModal()" class="px-4 py-2 bg-[#2451FF] hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow flex items-center gap-1.5 transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>+ Schedule Entry</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Planning Notice Banner -->
+    <div class="bg-blue-50/70 border border-blue-200/80 rounded-2xl p-4 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="info" class="w-4 h-4"></i>
+            </div>
+            <div>
+                <span class="text-xs font-bold text-blue-900 block">Editorial Planning Pipeline</span>
+                <p class="text-[11px] text-blue-700">
+                    This is your content strategy calendar. Normal calendar operations operate instantly at zero AI token cost. Auto-publishing to Instagram is not enabled without direct publishing API permissions.
+                </p>
+            </div>
+        </div>
+        <div class="text-xs font-bold text-blue-800 flex-shrink-0">
+            Total Pipeline: {{ status_counts.ALL }} Entries
+        </div>
+    </div>
+
+    <!-- Status Pipeline Metric Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <a href="?view={{ view_mode }}" class="p-3 rounded-xl border {% if not status_filter %}bg-[#2451FF] text-white border-[#2451FF]{% else %}bg-white border-slate-200 hover:border-slate-300 text-slate-700{% endif %} transition text-center shadow-xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider block opacity-80">All Entries</span>
+            <span class="text-xl font-black block mt-0.5">{{ status_counts.ALL }}</span>
+        </a>
+        <a href="?status=IDEA&view={{ view_mode }}" class="p-3 rounded-xl border {% if status_filter == 'IDEA' %}bg-amber-500 text-white border-amber-500{% else %}bg-white border-slate-200 hover:border-slate-300 text-slate-700{% endif %} transition text-center shadow-xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider block opacity-80">Ideas</span>
+            <span class="text-xl font-black block mt-0.5">{{ status_counts.IDEA }}</span>
+        </a>
+        <a href="?status=SCRIPT_READY&view={{ view_mode }}" class="p-3 rounded-xl border {% if status_filter == 'SCRIPT_READY' %}bg-blue-600 text-white border-blue-600{% else %}bg-white border-slate-200 hover:border-slate-300 text-slate-700{% endif %} transition text-center shadow-xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider block opacity-80">Script Ready</span>
+            <span class="text-xl font-black block mt-0.5">{{ status_counts.SCRIPT_READY }}</span>
+        </a>
+        <a href="?status=READY_TO_FILM&view={{ view_mode }}" class="p-3 rounded-xl border {% if status_filter == 'READY_TO_FILM' %}bg-purple-600 text-white border-purple-600{% else %}bg-white border-slate-200 hover:border-slate-300 text-slate-700{% endif %} transition text-center shadow-xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider block opacity-80">Ready to Film</span>
+            <span class="text-xl font-black block mt-0.5">{{ status_counts.READY_TO_FILM }}</span>
+        </a>
+        <a href="?status=READY_TO_PUBLISH&view={{ view_mode }}" class="p-3 rounded-xl border {% if status_filter == 'READY_TO_PUBLISH' %}bg-orange-500 text-white border-orange-500{% else %}bg-white border-slate-200 hover:border-slate-300 text-slate-700{% endif %} transition text-center shadow-xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider block opacity-80">Ready to Post</span>
+            <span class="text-xl font-black block mt-0.5">{{ status_counts.READY_TO_PUBLISH }}</span>
+        </a>
+        <a href="?status=PUBLISHED&view={{ view_mode }}" class="p-3 rounded-xl border {% if status_filter == 'PUBLISHED' %}bg-emerald-600 text-white border-emerald-600{% else %}bg-white border-slate-200 hover:border-slate-300 text-slate-700{% endif %} transition text-center shadow-xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider block opacity-80">Published</span>
+            <span class="text-xl font-black block mt-0.5">{{ status_counts.PUBLISHED }}</span>
+        </a>
+    </div>
+
+    <!-- Navigation & Filter Toolbar -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <!-- Month Navigator -->
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1">
+                <a href="?year={{ prev_year }}&month={{ prev_month }}&view={{ view_mode }}&status={{ status_filter }}&content_type={{ type_filter }}" class="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </a>
+                <span class="text-sm font-black text-slate-900 px-2 min-w-36 text-center">
+                    {{ month_name }} {{ current_year }}
+                </span>
+                <a href="?year={{ next_year }}&month={{ next_month }}&view={{ view_mode }}&status={{ status_filter }}&content_type={{ type_filter }}" class="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+            <a href="?view={{ view_mode }}" class="text-xs text-[#2451FF] font-bold hover:underline">Today</a>
+        </div>
+
+        <!-- Filters and View Toggle -->
+        <div class="flex items-center gap-2 flex-wrap text-xs">
+            <form method="GET" class="flex items-center gap-2">
+                <input type="hidden" name="year" value="{{ current_year }}">
+                <input type="hidden" name="month" value="{{ current_month }}">
+                <input type="hidden" name="view" value="{{ view_mode }}">
+
+                <select name="content_type" onchange="this.form.submit()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 focus:outline-none">
+                    <option value="">All Formats</option>
+                    {% for code, label in content_type_choices %}
+                    <option value="{{ code }}" {% if type_filter == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="status" onchange="this.form.submit()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 focus:outline-none">
+                    <option value="">All Statuses</option>
+                    {% for code, label in status_choices %}
+                    <option value="{{ code }}" {% if status_filter == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+
+            <!-- View Switcher Toggle -->
+            <div class="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+                <a href="?year={{ current_year }}&month={{ current_month }}&view=month&status={{ status_filter }}&content_type={{ type_filter }}" class="px-3 py-1 rounded-lg text-xs font-bold transition {% if view_mode == 'month' %}bg-white text-slate-900 shadow-xs{% else %}text-slate-500 hover:text-slate-900{% endif %}">
+                    Grid
+                </a>
+                <a href="?year={{ current_year }}&month={{ current_month }}&view=list&status={{ status_filter }}&content_type={{ type_filter }}" class="px-3 py-1 rounded-lg text-xs font-bold transition {% if view_mode == 'list' %}bg-white text-slate-900 shadow-xs{% else %}text-slate-500 hover:text-slate-900{% endif %}">
+                    List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 1: MONTH CALENDAR GRID -->
+    {% if view_mode == 'month' %}
+    <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+        <!-- Day of Week Header -->
+        <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-center text-[11px] font-bold text-slate-500 uppercase tracking-wider py-2.5">
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+            <div>Sun</div>
+        </div>
+
+        <!-- Month Grid Rows -->
+        <div class="divide-y divide-slate-100">
+            {% for week in month_days %}
+            <div class="grid grid-cols-7 divide-x divide-slate-100 min-h-28">
+                {% for d in week %}
+                <div class="p-1.5 sm:p-2 flex flex-col justify-between transition {% if not d.is_current_month %}bg-slate-50/50 opacity-40{% elif d.is_today %}bg-blue-50/30{% else %}hover:bg-slate-50/40{% endif %}">
+                    {% if d.is_current_month %}
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-black {% if d.is_today %}w-6 h-6 rounded-full bg-[#2451FF] text-white flex items-center justify-center{% else %}text-slate-700{% endif %}">
+                            {{ d.day }}
+                        </span>
+                        <button @click="openCreateModalForDate('{{ d.date_str }}')" class="opacity-0 hover:opacity-100 text-slate-400 hover:text-[#2451FF] text-xs font-bold transition" title="Add entry on this day">
+                            +
+                        </button>
+                    </div>
+
+                    <!-- Entries List for this Day -->
+                    <div class="space-y-1 overflow-y-auto max-h-24">
+                        {% for entry in d.entries %}
+                        <div @click="openEditModal('{{ entry.id }}', '{{ entry.title|escapejs }}', '{{ entry.scheduled_date|date:'Y-m-d' }}', '{{ entry.scheduled_time|default:'' }}', '{{ entry.status }}', '{{ entry.content_type }}', '{{ entry.category|escapejs }}', '{{ entry.campaign_tags|escapejs }}', '{{ entry.notes|escapejs }}')" class="p-1.5 rounded-lg text-[10px] font-bold border cursor-pointer hover:shadow-xs transition truncate
+                            {% if entry.status == 'IDEA' %}bg-amber-50 text-amber-800 border-amber-200
+                            {% elif entry.status == 'SCRIPT_READY' %}bg-blue-50 text-blue-800 border-blue-200
+                            {% elif entry.status == 'READY_TO_FILM' %}bg-purple-50 text-purple-800 border-purple-200
+                            {% elif entry.status == 'READY_TO_PUBLISH' %}bg-orange-50 text-orange-800 border-orange-200
+                            {% elif entry.status == 'PUBLISHED' %}bg-emerald-50 text-emerald-800 border-emerald-200
+                            {% else %}bg-slate-50 text-slate-700 border-slate-200{% endif %}">
+                            <span class="block truncate">{{ entry.title }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div></div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- VIEW 2: LIST VIEW -->
+    {% if view_mode == 'list' %}
+    <div class="space-y-3">
+        {% if entries %}
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs divide-y divide-slate-100 overflow-hidden">
+            {% for entry in entries %}
+            <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50 transition">
+                <div class="space-y-1.5 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <!-- Status Badge -->
+                        <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase
+                            {% if entry.status == 'IDEA' %}bg-amber-100 text-amber-800
+                            {% elif entry.status == 'SCRIPT_READY' %}bg-blue-100 text-blue-800
+                            {% elif entry.status == 'READY_TO_FILM' %}bg-purple-100 text-purple-800
+                            {% elif entry.status == 'READY_TO_PUBLISH' %}bg-orange-100 text-orange-800
+                            {% elif entry.status == 'PUBLISHED' %}bg-emerald-100 text-emerald-800{% endif %}">
+                            {{ entry.get_status_display }}
+                        </span>
+
+                        <span class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-slate-100 text-slate-700">
+                            {{ entry.get_content_type_display }}
+                        </span>
+
+                        <span class="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                            <i data-lucide="calendar" class="w-3 h-3 text-slate-400"></i>
+                            {{ entry.scheduled_date|date:"M d, Y" }}
+                            {% if entry.scheduled_time %}at {{ entry.scheduled_time|time:"H:i" }}{% endif %}
+                        </span>
+
+                        {% if entry.category %}
+                        <span class="text-[10px] text-slate-400 font-semibold">• {{ entry.category }}</span>
+                        {% endif %}
+                    </div>
+
+                    <h4 class="text-sm font-black text-slate-900">{{ entry.title }}</h4>
+
+                    {% if entry.notes %}
+                    <p class="text-xs text-slate-500 line-clamp-1">{{ entry.notes }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Linked Resources & Actions -->
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    {% if entry.script %}
+                    <a href="{% url 'creator_script_detail' entry.script.id %}" class="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 flex items-center gap-1">
+                        <i data-lucide="video" class="w-3 h-3"></i>
+                        <span>Script</span>
+                    </a>
+                    {% endif %}
+
+                    <button @click="openRescheduleModal('{{ entry.id }}', '{{ entry.title|escapejs }}', '{{ entry.scheduled_date|date:'Y-m-d' }}', '{{ entry.status }}')" class="px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center gap-1">
+                        <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i>
+                        <span>Reschedule</span>
+                    </button>
+
+                    <button @click="openEditModal('{{ entry.id }}', '{{ entry.title|escapejs }}', '{{ entry.scheduled_date|date:'Y-m-d' }}', '{{ entry.scheduled_time|default:'' }}', '{{ entry.status }}', '{{ entry.content_type }}', '{{ entry.category|escapejs }}', '{{ entry.campaign_tags|escapejs }}', '{{ entry.notes|escapejs }}')" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100" title="Edit">
+                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                    </button>
+
+                    <form method="POST" action="{% url 'creator_calendar_entry_delete_api' entry.id %}" onsubmit="return confirm('Delete this calendar entry?');">
+                        {% csrf_token %}
+                        <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50" title="Delete">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-12 text-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto">
+                <i data-lucide="calendar" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-sm font-bold text-slate-900">No scheduled entries in this view</h4>
+            <p class="text-xs text-slate-500 max-w-sm mx-auto">
+                Click "+ Schedule Entry" to plan your upcoming reels, carousels, or video scripts.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- MODAL 1: CREATE / SCHEDULE ENTRY MODAL -->
+    <div x-show="showCreateModal" class="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4" @click.away="showCreateModal = false">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                    <i data-lucide="calendar-plus" class="w-4 h-4 text-sky-600"></i>
+                    <span>Schedule Content Entry</span>
+                </h3>
+                <button @click="showCreateModal = false" class="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+
+            <form method="POST" action="{% url 'creator_calendar_entry_create_api' %}" class="space-y-3">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Content Title / Topic *</label>
+                    <input type="text" name="title" x-model="modalForm.title" required placeholder="e.g. 3 AI Tools That Replace 10 Staff" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Scheduled Date *</label>
+                        <input type="date" name="scheduled_date" x-model="modalForm.scheduled_date" required class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Time (Optional)</label>
+                        <input type="time" name="scheduled_time" x-model="modalForm.scheduled_time" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Production Status</label>
+                        <select name="status" x-model="modalForm.status" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                            {% for code, label in status_choices %}
+                            <option value="{{ code }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Content Format</label>
+                        <select name="content_type" x-model="modalForm.content_type" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                            {% for code, label in content_type_choices %}
+                            <option value="{{ code }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Link to Saved Script -->
+                {% if saved_scripts %}
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Link Saved Script (Optional)</label>
+                    <select name="script_id" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                        <option value="">-- No Linked Script --</option>
+                        {% for s in saved_scripts %}
+                        <option value="{{ s.id }}">{{ s.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <!-- Link to Saved Content Idea -->
+                {% if saved_ideas %}
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Link Saved Idea (Optional)</label>
+                    <select name="content_idea_id" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none">
+                        <option value="">-- No Linked Idea --</option>
+                        {% for i in saved_ideas %}
+                        <option value="{{ i.id }}">{{ i.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Planning Notes / Filming Checklist</label>
+                    <textarea name="notes" rows="2" placeholder="Props needed, b-roll shots, CTA link to test..." class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 focus:bg-white focus:border-[#2451FF] focus:outline-none"></textarea>
+                </div>
+
+                <div class="pt-2 flex items-center justify-end gap-2">
+                    <button type="button" @click="showCreateModal = false" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-[#2451FF] hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow">Schedule Content</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: FAST RESCHEDULE MODAL -->
+    <div x-show="showRescheduleModal" class="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4" @click.away="showRescheduleModal = false">
+            <h3 class="text-sm font-black text-slate-900">Reschedule Entry</h3>
+            <p class="text-xs text-slate-500 font-medium" x-text="rescheduleData.title"></p>
+
+            <form @submit.prevent="submitReschedule()" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">New Date</label>
+                    <input type="date" x-model="rescheduleData.date" required class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Update Status</label>
+                    <select x-model="rescheduleData.status" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-slate-50">
+                        {% for code, label in status_choices %}
+                        <option value="{{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="pt-2 flex items-center justify-end gap-2">
+                    <button type="button" @click="showRescheduleModal = false" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700">Cancel</button>
+                    <button type="submit" class="px-4 py-1.5 bg-[#2451FF] text-white font-bold text-xs rounded-xl">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function contentCalendarStudio() {
+    return {
+        showCreateModal: false,
+        showRescheduleModal: false,
+        modalForm: {
+            title: '',
+            scheduled_date: '{{ today_str }}',
+            scheduled_time: '',
+            status: 'IDEA',
+            content_type: 'REEL'
+        },
+        rescheduleData: {
+            id: '',
+            title: '',
+            date: '',
+            status: ''
+        },
+
+        openCreateModal() {
+            this.modalForm.scheduled_date = '{{ today_str }}';
+            this.modalForm.title = '';
+            this.showCreateModal = true;
+        },
+
+        openCreateModalForDate(dateStr) {
+            this.modalForm.scheduled_date = dateStr;
+            this.modalForm.title = '';
+            this.showCreateModal = true;
+        },
+
+        openRescheduleModal(id, title, dateStr, status) {
+            this.rescheduleData = { id, title, date: dateStr, status };
+            this.showRescheduleModal = true;
+        },
+
+        async submitReschedule() {
+            try {
+                const resp = await fetch(`/creator/growth-studio/calendar/${this.rescheduleData.id}/reschedule/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        scheduled_date: this.rescheduleData.date,
+                        status: this.rescheduleData.status
+                    })
+                });
+                const data = await resp.json();
+                if (data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Error rescheduling');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        },
+
+        openEditModal(id, title, dateStr, timeStr, status, type, cat, tags, notes) {
+            // Fast prompt edit or open reschedule
+            this.openRescheduleModal(id, title, dateStr, status);
+        }
+    }
+}
+</script>
+{% endblock %}

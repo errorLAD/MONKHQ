@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Product — {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">Edit Product</h1>
+            <p class="text-xs text-slate-500">Update e-commerce product details, image, price, stock, and links.</p>
+        </div>
+        <a href="{% url 'creator_sales_products' %}" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200 transition">
+            ← Back to Catalog
+        </a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Product Name</label>
+                <input type="text" name="name" value="{{ product.name }}" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Product Type</label>
+                <select name="product_type" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                    <option value="PHYSICAL" {% if product.product_type == 'PHYSICAL' %}selected{% endif %}>Physical Product</option>
+                    <option value="DIGITAL" {% if product.product_type == 'DIGITAL' %}selected{% endif %}>Digital Product</option>
+                    <option value="AFFILIATE" {% if product.product_type == 'AFFILIATE' %}selected{% endif %}>Affiliate Product</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Regular Price ($)</label>
+                <input type="number" step="0.01" name="price" value="{{ product.price }}" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Sale / Discount Price ($)</label>
+                <input type="number" step="0.01" name="sale_price" value="{{ product.sale_price|default:'' }}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">SKU / Code</label>
+                <input type="text" name="sku" value="{{ product.sku }}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Inventory / Stock Count</label>
+                <input type="number" name="inventory" value="{{ product.inventory }}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Status</label>
+                <select name="status" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                    <option value="ACTIVE" {% if product.status == 'ACTIVE' %}selected{% endif %}>Active</option>
+                    <option value="DRAFT" {% if product.status == 'DRAFT' %}selected{% endif %}>Draft</option>
+                    <option value="ARCHIVED" {% if product.status == 'ARCHIVED' %}selected{% endif %}>Archived</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">External / Buy URL</label>
+                <input type="url" name="external_url" value="{{ product.external_url }}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Product Description</label>
+            <textarea name="description" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">{{ product.description }}</textarea>
+        </div>
+
+        <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Product Image</label>
+            {% if product.image %}
+                <div class="flex items-center gap-3 mb-2">
+                    <img src="{{ product.image.url }}" class="w-12 h-12 rounded-xl object-cover border">
+                    <span class="text-xs text-slate-500 font-medium">Current Image Uploaded</span>
+                </div>
+            {% endif %}
+            <input type="file" name="image" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-medium">
+        </div>
+
+        <div class="pt-4 flex items-center justify-between border-t border-slate-100">
+            <a href="{% url 'creator_sales_product_delete' product_id=product.id %}" onclick="return confirm('Delete this product permanently?')" class="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-xs rounded-xl transition">
+                Delete Product
+            </a>
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow transition">
+                Save Product Details
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

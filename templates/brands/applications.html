@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Applications — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Creator Applications Review</h1>
+        <p class="text-sm text-slate-500">Accept or reject creator proposals for your promotions marketplace deals.</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="divide-y divide-slate-100">
+            {% for app in applications %}
+                <div class="p-6 flex items-center justify-between hover:bg-slate-50">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-slate-900 text-sm">@{{ app.creator.username }}</span>
+                            <span class="text-xs text-slate-500">applied for</span>
+                            <span class="font-bold text-indigo-600 text-sm">"{{ app.promotion.title }}"</span>
+                        </div>
+                        <p class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200">Pitch: {{ app.pitch }}</p>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <span class="text-base font-black text-emerald-600">${{ app.requested_amount }}</span>
+                        {% if app.status == 'PENDING' %}
+                            <form method="POST" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="application_id" value="{{ app.id }}">
+                                <input type="hidden" name="action" value="accept">
+                                <button type="submit" class="px-3 py-1.5 bg-emerald-600 text-white font-bold text-xs rounded-lg shadow">
+                                    Accept Application
+                                </button>
+                            </form>
+                            <form method="POST" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="application_id" value="{{ app.id }}">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 font-bold text-xs rounded-lg">
+                                    Reject
+                                </button>
+                            </form>
+                        {% else %}
+                            <span class="px-3 py-1 bg-slate-100 text-slate-700 font-bold text-xs rounded-full">
+                                {{ app.status }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="p-8 text-center text-slate-400 text-sm">No creator applications to review.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

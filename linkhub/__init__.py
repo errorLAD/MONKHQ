@@ -1,0 +1,1 @@
+# Linkhub App Init

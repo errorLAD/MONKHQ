@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Engine & Knowledge Base — Super Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">AI ENGINE & KNOWLEDGE BASE GOVERNANCE</h1>
+            <p class="text-xs text-slate-500">Inspect system-wide AI Sales Agents, Knowledge Documents, and intent matching.</p>
+        </div>
+    </div>
+
+    <!-- AI Agents Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b border-slate-100 font-extrabold text-xs text-slate-950 uppercase tracking-wider">
+            AI Sales Agents ({{ agents.count }})
+        </div>
+        <table class="w-full text-left border-collapse text-xs">
+            <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase">
+                    <th class="p-3.5">Agent Name</th>
+                    <th class="p-3.5">Workspace</th>
+                    <th class="p-3.5">Mode</th>
+                    <th class="p-3.5">Conversations</th>
+                    <th class="p-3.5">Revenue</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for ag in agents %}
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3.5 font-bold text-slate-950">{{ ag.agent_name }}</td>
+                        <td class="p-3.5 text-blue-600 font-bold">{{ ag.workspace.name }}</td>
+                        <td class="p-3.5"><span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-bold rounded-full text-[10px]">{{ ag.mode }}</span></td>
+                        <td class="p-3.5 font-bold text-slate-900">{{ ag.conversations_count }}</td>
+                        <td class="p-3.5 font-black text-emerald-600">${{ ag.revenue|floatformat:2 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="p-8 text-center text-xs text-slate-400">No AI Sales Agents active.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

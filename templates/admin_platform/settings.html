@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Platform Settings & Feature Flags — Super Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">PLATFORM SETTINGS & FEATURE FLAGS</h1>
+            <p class="text-xs text-slate-500">Configure global AI sales agent rules, rate limits, Meta Graph API tokens, and feature toggles.</p>
+        </div>
+    </div>
+
+    <!-- Feature Flags Card -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-950 border-b pb-2">Global Feature Flags</h3>
+        
+        <div class="space-y-3 text-xs font-semibold">
+            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                <div>
+                    <span class="font-bold text-slate-950 block">AI Sales Engine Auto-Response</span>
+                    <span class="text-[11px] text-slate-500">Allow AI agents to send direct automated DM responses to Instagram comments.</span>
+                </div>
+                <input type="checkbox" checked class="rounded text-rose-600 w-4 h-4">
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                <div>
+                    <span class="font-bold text-slate-950 block">Re-trigger Engine Historical Scanning</span>
+                    <span class="text-[11px] text-slate-500">Allow creators to scan past 90 days of Reel comments for missed buyer leads.</span>
+                </div>
+                <input type="checkbox" checked class="rounded text-rose-600 w-4 h-4">
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                <div>
+                    <span class="font-bold text-slate-950 block">Link Hub Storefront Digital Downloads</span>
+                    <span class="text-[11px] text-slate-500">Enable automatic PDF and digital asset delivery inside DM conversations.</span>
+                </div>
+                <input type="checkbox" checked class="rounded text-rose-600 w-4 h-4">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

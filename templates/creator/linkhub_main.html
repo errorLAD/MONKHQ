@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}My Link Hub 2.0 — MonkHQ{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    
+    <!-- Prominent Storefront & Public Profile Banner -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 text-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 border border-blue-800/40">
+        <div class="space-y-1.5 text-center md:text-left">
+            <div class="flex items-center gap-2 justify-center md:justify-start">
+                <span class="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-black rounded-full border border-emerald-400/30">
+                    ● PUBLISHED & LIVE
+                </span>
+                <span class="text-xs font-semibold text-blue-200">monkhq.in/@{{ link_hub.username }}</span>
+            </div>
+            <h2 class="text-lg font-black tracking-tight text-white">Your Public Link Hub & Storefront</h2>
+            <p class="text-xs text-blue-200/80">Share this link in your Instagram bio, YouTube description, TikTok profile, or website.</p>
+        </div>
+
+        <div class="flex items-center gap-2.5 flex-wrap justify-center">
+            <button onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}/@{{ link_hub.username }}/'); alert('Storefront Profile link copied!')" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 backdrop-blur-md border border-white/10">
+                <i data-lucide="copy" class="w-4 h-4"></i> Copy Storefront Link
+            </button>
+            <a href="{% url 'public_linkhub_at' username=link_hub.username %}" target="_blank" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs rounded-xl transition flex items-center gap-1.5 shadow-lg">
+                <i data-lucide="external-link" class="w-4 h-4"></i> Visit Public Storefront
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Split Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Blocks Editor -->
+        <div class="lg:col-span-7 space-y-6">
+            
+            <!-- Add New Block Card -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                    <i data-lucide="plus-circle" class="w-4 h-4 text-blue-600"></i> Add New Link or Content Block
+                </h3>
+
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Block Title</label>
+                            <input type="text" name="title" placeholder="e.g. 📸 YouTube Gear Recommendations" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-blue-600" required>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Block Type</label>
+                            <select name="item_type" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-blue-600">
+                                <option value="CUSTOM_LINK">Custom Link URL</option>
+                                <option value="PRODUCT">Physical Product Card</option>
+                                <option value="DIGITAL_PRODUCT">Digital Product Download</option>
+                                <option value="AFFILIATE_PRODUCT">Affiliate Product</option>
+                                <option value="CONTACT_FORM">Lead Capture Contact Form</option>
+                                <option value="EMAIL_SIGNUP">Email Newsletter Signup</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Target URL</label>
+                            <input type="url" name="url" placeholder="https://..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Price (If Product)</label>
+                            <input type="number" step="0.01" name="price" placeholder="49.99" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">
+                        + Add Block to Link Hub
+                    </button>
+                </form>
+            </div>
+
+            <!-- Existing Blocks List -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                    <span class="font-extrabold text-xs text-slate-900 uppercase tracking-wider">Active Link Hub Blocks ({{ items.count }})</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">Drag or toggle status</span>
+                </div>
+
+                <div class="divide-y divide-slate-100">
+                    {% for item in items %}
+                        <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="flex flex-col gap-0.5">
+                                    <a href="{% url 'creator_linkhub_item_move_api' item_id=item.id direction='up' %}" class="text-slate-300 hover:text-slate-700 p-0.5" title="Move Up"><i data-lucide="chevron-up" class="w-3.5 h-3.5"></i></a>
+                                    <a href="{% url 'creator_linkhub_item_move_api' item_id=item.id direction='down' %}" class="text-slate-300 hover:text-slate-700 p-0.5" title="Move Down"><i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></a>
+                                </div>
+                                {% if item.image %}
+                                    <img src="{{ item.image.url }}" class="w-9 h-9 rounded-lg object-cover border border-slate-200 shadow-sm">
+                                {% else %}
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
+                                        {% if item.item_type == 'PRODUCT' %}
+                                            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                                        {% elif item.item_type == 'DIGITAL_PRODUCT' %}
+                                            <i data-lucide="file-down" class="w-4 h-4"></i>
+                                        {% elif item.item_type == 'CONTACT_FORM' %}
+                                            <i data-lucide="mail" class="w-4 h-4"></i>
+                                        {% elif item.item_type == 'EMAIL_SIGNUP' %}
+                                            <i data-lucide="bell" class="w-4 h-4"></i>
+                                        {% else %}
+                                            <i data-lucide="link" class="w-4 h-4"></i>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <h4 class="text-xs font-extrabold text-slate-900">{{ item.title }}</h4>
+                                    <p class="text-[10px] text-slate-500 font-medium">{{ item.url|default:item.get_item_type_display }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+                                    {{ item.click_count }} Clicks
+                                </span>
+                                <a href="{% url 'creator_linkhub_item_edit' item_id=item.id %}" class="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit Block">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </a>
+                                <a href="{% url 'creator_linkhub_item_delete_api' item_id=item.id %}" onclick="return confirm('Delete this block?')" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Delete Block">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="p-8 text-center text-slate-400 text-xs font-semibold">
+                            No blocks configured yet. Add your first link or product above!
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right: Mobile Live Preview Phone Frame -->
+        <div class="lg:col-span-5 flex justify-center sticky top-6">
+            <div class="w-[320px] h-[640px] bg-slate-950 rounded-[45px] p-3 shadow-2xl border-4 border-slate-800 relative flex flex-col overflow-hidden">
+                <!-- Phone Notch -->
+                <div class="w-28 h-4 bg-slate-900 rounded-b-xl mx-auto absolute top-0 left-1/2 -translate-x-1/2 z-20"></div>
+                
+                <!-- Screen Iframe -->
+                <iframe src="{% url 'public_linkhub_at' username=link_hub.username %}" class="w-full h-full rounded-[35px] bg-white border-0"></iframe>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

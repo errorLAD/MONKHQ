@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Global Admin Search — Super Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">GLOBAL ADMIN SEARCH</h1>
+            <p class="text-xs text-slate-500">Query users, creators, brands, workspaces, automations, orders, products, and audit logs.</p>
+        </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+        <form method="GET" class="flex items-center gap-3">
+            <div class="relative flex-1">
+                <input type="text" name="q" value="{{ search_q }}" placeholder="Search by name, email, username, order ID, product name, action..." autofocus class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-rose-600">
+                <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            </div>
+            <button type="submit" class="px-6 py-3 bg-gradient-to-r from-slate-900 to-rose-950 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow">
+                Execute Search
+            </button>
+        </form>
+    </div>
+
+    {% if search_q %}
+        <!-- Search Results Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Users Result -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                <h3 class="text-xs font-black uppercase tracking-wider text-slate-950 border-b pb-2 flex items-center justify-between">
+                    <span>Matched Users ({{ users|length }})</span>
+                    <i data-lucide="users" class="w-4 h-4 text-blue-600"></i>
+                </h3>
+                <div class="divide-y divide-slate-100 text-xs">
+                    {% for u in users %}
+                        <div class="py-2 flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-slate-950">@{{ u.username }}</span>
+                                <span class="text-slate-400 text-[11px] block">{{ u.email }}</span>
+                            </div>
+                            <a href="{% url 'admin_impersonate' user_id=u.id %}" class="px-2.5 py-1 bg-purple-50 text-purple-700 font-bold text-[10px] rounded-lg">Impersonate</a>
+                        </div>
+                    {% empty %}
+                        <p class="text-xs text-slate-400 py-2">No user matches.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Automations Result -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                <h3 class="text-xs font-black uppercase tracking-wider text-slate-950 border-b pb-2 flex items-center justify-between">
+                    <span>Matched Automations ({{ automations|length }})</span>
+                    <i data-lucide="bot" class="w-4 h-4 text-purple-600"></i>
+                </h3>
+                <div class="divide-y divide-slate-100 text-xs">
+                    {% for auto in automations %}
+                        <div class="py-2 flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-slate-950">{{ auto.name }}</span>
+                                <span class="text-slate-400 text-[11px] block">{{ auto.workspace.name }}</span>
+                            </div>
+                            <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-bold text-[10px] rounded-full">{{ auto.status }}</span>
+                        </div>
+                    {% empty %}
+                        <p class="text-xs text-slate-400 py-2">No automation matches.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}System Health & Monitoring — Super Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-950">SYSTEM HEALTH & INFRASTRUCTURE MONITORING</h1>
+            <p class="text-xs text-slate-500">Real-time status of PostgreSQL database, Redis, Celery workers, and Meta API integration.</p>
+        </div>
+        <a href="{% url 'admin_platform_health' %}" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200">
+            Re-check Health
+        </a>
+    </div>
+
+    <!-- Health Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Service 1: PostgreSQL -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-black uppercase text-slate-950">PostgreSQL DB</span>
+                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-black text-[10px] rounded-full border border-emerald-200">
+                    {{ health.database.status }}
+                </span>
+            </div>
+            <div class="text-xs text-slate-500 font-semibold">Latency: <strong class="text-slate-900">{{ health.database.latency }}</strong></div>
+        </div>
+
+        <!-- Service 2: Redis Cache -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-black uppercase text-slate-950">Redis Cache</span>
+                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-black text-[10px] rounded-full border border-emerald-200">
+                    {{ health.redis.status }}
+                </span>
+            </div>
+            <div class="text-xs text-slate-500 font-semibold">Latency: <strong class="text-slate-900">{{ health.redis.latency }}</strong></div>
+        </div>
+
+        <!-- Service 3: Celery Workers -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-black uppercase text-slate-950">Celery Workers</span>
+                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-black text-[10px] rounded-full border border-emerald-200">
+                    {{ health.celery.status }}
+                </span>
+            </div>
+            <div class="text-xs text-slate-500 font-semibold">Active Workers: <strong class="text-slate-900">{{ health.celery.workers }}</strong></div>
+        </div>
+
+        <!-- Service 4: Meta Graph API -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-black uppercase text-slate-950">Meta API</span>
+                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-black text-[10px] rounded-full border border-emerald-200">
+                    {{ health.meta_api.status }}
+                </span>
+            </div>
+            <div class="text-xs text-slate-500 font-semibold">Ping Latency: <strong class="text-slate-900">{{ health.meta_api.latency }}</strong></div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
